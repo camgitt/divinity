@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DivinityAGI - Comprehensive Technical Plan</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.7;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 {
+            font-size: 36px;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 24px;
+            color: #58a6ff;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #21262d;
+        }
+        h3 {
+            font-size: 18px;
+            color: #79c0ff;
+            margin: 25px 0 15px 0;
+        }
+        p { margin-bottom: 15px; }
+        .subtitle { color: #8b949e; margin-bottom: 30px; }
+        .back-link {
+            display: inline-block;
+            color: #58a6ff;
+            text-decoration: none;
+            margin-bottom: 30px;
+        }
+        .back-link:hover { text-decoration: underline; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #21262d;
+        }
+        th {
+            background: #161b22;
+            color: #79c0ff;
+            font-weight: 600;
+        }
+        tr:hover { background: rgba(56, 139, 253, 0.1); }
+        code {
+            background: #161b22;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 13px;
+        }
+        pre {
+            background: #161b22;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .easy { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .moderate { background: rgba(234, 179, 8, 0.2); color: #eab308; }
+        .challenging { background: rgba(249, 115, 22, 0.2); color: #f97316; }
+        .critical { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .highlight {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 3px solid #FFD700;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .warning {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid #ef4444;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        ul { margin: 15px 0; padding-left: 25px; }
+        li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="./" class="back-link">← Back to Plans</a>
+
+        <h1>Comprehensive Technical Plan</h1>
+        <p class="subtitle">Deep-dive implementation details for DivinityAGI iPhone app</p>
+
+        <h2>1. Overall Complexity Assessment</h2>
+        <table>
+            <tr><th>Metric</th><th>Value</th><th>Notes</th></tr>
+            <tr><td>Total Components</td><td>200+</td><td>React components → SwiftUI equivalents</td></tr>
+            <tr><td>Lines of Code</td><td>~72,000</td><td>Estimated 50,000 Swift lines</td></tr>
+            <tr><td>State Contexts</td><td>24</td><td>Convert to @Observable classes</td></tr>
+            <tr><td>API Services</td><td>13</td><td>Mostly reusable with Swift SDK</td></tr>
+            <tr><td>Third-Party APIs</td><td>4 major</td><td>Supabase, D-ID, Stripe→StoreKit, Firebase</td></tr>
+            <tr><td>Asset Files</td><td>300+ images</td><td>67MB, need @2x/@3x versions</td></tr>
+            <tr><td>Unique Screens</td><td>35+</td><td>All need SwiftUI recreation</td></tr>
+        </table>
+
+        <h2>2. Critical Path Items</h2>
+
+        <h3>🔴 D-ID Video Chat Integration</h3>
+        <div class="warning">
+            <strong>BLOCKER RISK:</strong> D-ID does NOT have an official iOS SDK
+        </div>
+        <p><strong>Current Web Implementation:</strong></p>
+        <ul>
+            <li>Creates AI avatars from static images via D-ID API</li>
+            <li>Polls for video completion (30 attempts, 2s intervals)</li>
+            <li>Embedded iframe for real-time chat</li>
+            <li>8 spiritual voices across languages</li>
+        </ul>
+        <p><strong>iOS Solutions:</strong></p>
+        <table>
+            <tr><th>Option</th><th>Complexity</th><th>Fidelity</th><th>Risk</th></tr>
+            <tr><td>WKWebView Wrapper (Recommended)</td><td><span class="badge challenging">Challenging</span></td><td>95%</td><td>Medium</td></tr>
+            <tr><td>Direct API + AVPlayer</td><td><span class="badge moderate">Moderate</span></td><td>70%</td><td>Low</td></tr>
+            <tr><td>Native WebRTC</td><td><span class="badge critical">Critical</span></td><td>100%</td><td>High</td></tr>
+        </table>
+
+        <h3>🔴 Subscription Migration (Stripe → StoreKit)</h3>
+        <div class="warning">
+            <strong>REQUIRED:</strong> Apple requires all digital purchases to use In-App Purchases
+        </div>
+        <p><strong>Impact:</strong></p>
+        <ul>
+            <li>Apple takes 30% cut (15% for Small Business Program)</li>
+            <li>Must recreate products in App Store Connect</li>
+            <li>Different refund/cancellation process</li>
+            <li>Existing web subscribers need migration path</li>
+        </ul>
+        <p><strong>Cross-Platform Sync Architecture:</strong></p>
+        <pre>
+┌─────────────────────────────────────────────────────────┐
+│                    SUPABASE BACKEND                     │
+│  ┌─────────────────┐       ┌─────────────────┐         │
+│  │ Stripe Webhook  │       │ Apple Server    │         │
+│  │ Listener        │       │ Notification V2 │         │
+│  └────────┬────────┘       └────────┬────────┘         │
+│           └───────────┬─────────────┘                   │
+│                       ▼                                 │
+│  ┌──────────────────────────────────────────┐          │
+│  │         user_subscriptions table          │          │
+│  │  - user_id, tier, source, expires_at     │          │
+│  └──────────────────────────────────────────┘          │
+└─────────────────────────────────────────────────────────┘
+        </pre>
+
+        <h2>3. Audio System Architecture</h2>
+        <p><strong>Web → iOS Migration:</strong></p>
+        <table>
+            <tr><th>Web (Web Audio API)</th><th>iOS (AVAudioEngine)</th></tr>
+            <tr><td>OscillatorNode</td><td>AVAudioSourceNode</td></tr>
+            <tr><td>BiquadFilterNode</td><td>AVAudioUnitEQ</td></tr>
+            <tr><td>AnalyserNode (FFT)</td><td>vDSP (Accelerate)</td></tr>
+            <tr><td>GainNode</td><td>AVAudioMixerNode</td></tr>
+            <tr><td>ScriptProcessorNode</td><td>Custom DSP in Swift</td></tr>
+        </table>
+        <p><strong>Brown Noise Generation (Swift):</strong></p>
+        <pre>
+class BrownNoiseGenerator {
+    private var lastOutput: Float = 0
+
+    func generateSample() -> Float {
+        let white = Float.random(in: -1...1)
+        let brown = (lastOutput + (0.02 * white)) / 1.02
+        lastOutput = brown
+        return brown * 3.5
+    }
+}
+        </pre>
+
+        <h2>4. Particle Effects (SpriteKit)</h2>
+        <p><strong>7 Patterns to Implement:</strong></p>
+        <table>
+            <tr><th>Pattern</th><th>Faiths</th><th>Behavior</th></tr>
+            <tr><td>Beams</td><td>Christianity, Sikhism</td><td>Vertical light rays, varying opacity</td></tr>
+            <tr><td>Lotus</td><td>Buddhism, Jainism</td><td>Rotating petals, scale pulsing</td></tr>
+            <tr><td>Fire</td><td>Hinduism</td><td>Rising particles that fade out</td></tr>
+            <tr><td>Geometry</td><td>Islam, Taoism</td><td>Rotating sacred geometry shapes</td></tr>
+            <tr><td>Crescents</td><td>Islam</td><td>Crescent moon shapes, pulsing</td></tr>
+            <tr><td>Stars</td><td>Judaism, Shinto, Universal</td><td>Twinkling star field</td></tr>
+            <tr><td>Waves</td><td>Still Water micro-state</td><td>Horizontal sine wave motion</td></tr>
+        </table>
+
+        <h2>5. State Management Migration</h2>
+        <p><strong>React Context → Swift @Observable:</strong></p>
+        <pre>
+// React (Before)
+const SubscriptionContext = createContext();
+const [tier, setTier] = useState('seeker');
+
+// Swift (After)
+@Observable
+class SubscriptionState {
+    var tier: SubscriptionTier = .seeker
+    var tokenBalance: TokenBalance = TokenBalance()
+
+    func useTokens(_ amount: Int) -> Bool {
+        guard tokenBalance.total >= amount else { return false }
+        tokenBalance.daily -= amount
+        return true
+    }
+}
+        </pre>
+        <p><strong>24 Contexts to Migrate:</strong></p>
+        <ul>
+            <li>ThemeContext → @AppStorage + @Observable</li>
+            <li>SubscriptionContext → @Observable singleton</li>
+            <li>SoundContext → @Observable + AVAudioEngine</li>
+            <li>MeditationContext → @Observable + Timer</li>
+            <li>BadgesContext → @Observable + Core Data</li>
+            <li>... and 19 more</li>
+        </ul>
+
+        <h2>6. Guide Matching Algorithm</h2>
+        <div class="highlight">
+            <strong>100% Portable:</strong> Algorithm logic can be directly translated to Swift
+        </div>
+        <p><strong>Scoring System (100 points):</strong></p>
+        <table>
+            <tr><th>Factor</th><th>Points</th><th>Description</th></tr>
+            <tr><td>Spiritual Goals</td><td>25</td><td>Match guide specialties to user goals</td></tr>
+            <tr><td>Guide Archetype</td><td>25</td><td>Advisor/Healer/Scholar/Celebrant</td></tr>
+            <tr><td>Age Preference</td><td>20</td><td>Young/Middle-aged/Elder</td></tr>
+            <tr><td>Journey Level</td><td>15</td><td>Beginner/Intermediate/Advanced</td></tr>
+            <tr><td>Sect Focus</td><td>10</td><td>Specific tradition variants</td></tr>
+            <tr><td>Personality</td><td>5</td><td>Compassionate/Wise/Peaceful/etc.</td></tr>
+        </table>
+
+        <h2>7. Project Structure (Xcode)</h2>
+        <pre>
+DivinityAGI/
+├── App/
+│   ├── DivinityAGIApp.swift
+│   └── ContentView.swift
+├── Core/
+│   ├── Models/           # Codable structs
+│   ├── Services/         # API services
+│   └── Extensions/       # Swift extensions
+├── Features/
+│   ├── Authentication/
+│   ├── CircleOfFaiths/
+│   ├── SpiritGuides/
+│   ├── Chat/
+│   ├── QuietSpace/
+│   ├── Journal/
+│   ├── Community/
+│   ├── Profile/
+│   └── Subscription/
+├── Design/
+│   ├── Theme/            # Colors, fonts
+│   ├── Components/       # Reusable UI
+│   └── Assets.xcassets/
+└── Resources/
+    ├── Sounds/
+    ├── Fonts/
+    └── Localizable.strings
+        </pre>
+
+        <h2>8. Risk Summary</h2>
+        <table>
+            <tr><th>Risk</th><th>Severity</th><th>Mitigation</th></tr>
+            <tr><td>D-ID no iOS SDK</td><td><span class="badge critical">High</span></td><td>WKWebView wrapper, test in Week 1</td></tr>
+            <tr><td>App Store rejection (religious content)</td><td><span class="badge moderate">Medium</span></td><td>17+ rating, disclaimers</td></tr>
+            <tr><td>Subscription sync complexity</td><td><span class="badge moderate">Medium</span></td><td>Backend webhook handlers</td></tr>
+            <tr><td>Audio background mode</td><td><span class="badge easy">Low</span></td><td>Proper AVAudioSession config</td></tr>
+            <tr><td>Performance with 100+ guides</td><td><span class="badge easy">Low</span></td><td>Lazy loading, image caching</td></tr>
+        </table>
+
+        <h2>9. Estimated Effort (AI-Assisted)</h2>
+        <table>
+            <tr><th>Phase</th><th>Duration</th><th>Key Deliverables</th></tr>
+            <tr><td>Foundation</td><td>2 weeks</td><td>Setup, auth, D-ID POC</td></tr>
+            <tr><td>Core Experience</td><td>4 weeks</td><td>Faiths, guides, chat</td></tr>
+            <tr><td>Meditation</td><td>3 weeks</td><td>Quiet space, audio, particles</td></tr>
+            <tr><td>Engagement</td><td>3 weeks</td><td>Journal, goals, community</td></tr>
+            <tr><td>Monetization</td><td>2 weeks</td><td>StoreKit, subscriptions</td></tr>
+            <tr><td>Polish & Launch</td><td>2 weeks</td><td>Widgets, App Store</td></tr>
+            <tr><td><strong>Total</strong></td><td><strong>16 weeks</strong></td><td></td></tr>
+        </table>
+
+        <div class="highlight" style="margin-top: 40px;">
+            <strong>Bottom Line:</strong> 98% design fidelity, 100%+ functional parity achievable in 12-16 weeks with AI-assisted development.
+        </div>
+
+    </div>
+</body>
+</html>
