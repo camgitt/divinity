@@ -2,9 +2,36 @@
   import { defineConfig } from 'vite';
   import react from '@vitejs/plugin-react-swc';
   import path from 'path';
+  import fs from 'fs';
+
+  // Custom plugin to handle all figma:asset/* imports with fallback
+  function figmaAssetPlugin() {
+    const assetsDir = path.resolve(__dirname, './src/assets');
+    // Use first available image as fallback
+    const fallbackImage = fs.readdirSync(assetsDir).find(f => f.endsWith('.png'));
+    const fallbackPath = fallbackImage ? path.join(assetsDir, fallbackImage) : null;
+
+    return {
+      name: 'figma-asset-resolver',
+      resolveId(source: string) {
+        if (source.startsWith('figma:asset/')) {
+          const assetName = source.replace('figma:asset/', '');
+          const assetPath = path.resolve(assetsDir, assetName);
+          // Return actual path if exists, otherwise use fallback
+          if (fs.existsSync(assetPath)) {
+            return assetPath;
+          } else if (fallbackPath) {
+            console.warn(`[figma-asset] Missing: ${assetName}, using fallback`);
+            return fallbackPath;
+          }
+        }
+        return null;
+      }
+    };
+  }
 
   export default defineConfig({
-    plugins: [react()],
+    plugins: [react(), figmaAssetPlugin()],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
