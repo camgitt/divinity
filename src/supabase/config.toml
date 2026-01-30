@@ -1,0 +1,22 @@
+# Supabase Configuration
+
+project_id = "wukzavslddamlxoksxuo"
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[functions]
+# Edge functions disabled - deployment handled separately
+enabled = false
+
+[edge-runtime]
+# Edge runtime disabled to prevent 403 deployment errors
+enabled = false

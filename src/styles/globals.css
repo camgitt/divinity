@@ -1,0 +1,1095 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Butler:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  
+  /* Raleway and Poppins Font System */
+  --font-family-base: 'Raleway', sans-serif;
+  --font-family-display: 'Poppins', sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-black: 900;
+  
+  /* Clear Type Scale */
+  --font-size-display: 72px;      /* Display/Hero - Poppins 900 */
+  --font-size-display-mobile: 56px; /* Display/Hero mobile - Poppins 900 */
+  --font-size-h1: 48px;           /* H1 - Poppins 700 */
+  --font-size-h2: 32px;           /* H2 - Poppins 600 */
+  --font-size-h3: 24px;           /* H3 - Raleway 600 */
+  --font-size-h4: 20px;           /* H4 - Raleway 600 */
+  --font-size-body-large: 18px;   /* Body Large - Raleway 400 */
+  --font-size-body: 16px;         /* Body - Raleway 400 */
+  --font-size-body-small: 14px;   /* Body Small - Raleway 400 */
+  --font-size-caption: 12px;      /* Caption - Raleway 500 */
+  
+  /* Legacy Font Sizes (for compatibility) */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 24px;
+  --font-size-xxl: 32px;
+  
+  /* Line Heights */
+  --line-height-tight: 1.1;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.7;     /* Updated for improved readability */
+  --line-height-loose: 1.7;       /* Updated for improved readability */
+  
+  /* Letter Spacing */
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.05em;  /* For uppercase text */
+  
+  /* Enhanced Shadow System for Light Theme */
+  --elevation-1: 0 2px 8px rgba(107, 93, 211, 0.08);
+  --elevation-2: 0 4px 16px rgba(107, 93, 211, 0.12);
+  --elevation-3: 0 8px 24px rgba(107, 93, 211, 0.16);
+  --elevation-4: 0 16px 48px rgba(107, 93, 211, 0.20);
+  --elevation-hover-1: 0 4px 12px rgba(107, 93, 211, 0.15);
+  --elevation-hover-2: 0 8px 20px rgba(107, 93, 211, 0.18);
+  
+  /* Max Width for Readability */
+  --max-width-text: 680px;
+  --max-width-content: 1200px;
+  
+  /* Button Heights */
+  --button-height-small: 40px;
+  --button-height-medium: 48px;
+  --button-height-large: 56px;
+  
+  /* Section Spacing */
+  --section-spacing-mobile: 48px;
+  --section-spacing-desktop: 80px;
+  
+  /* Refined Color Palette for Light Theme */
+  --color-primary-purple: #6B5DD3;
+  --color-primary-purple-hover: #5B4DC3;
+  --color-primary-purple-light: #E8E5FF;
+  
+  --color-secondary-gold: #FFB84D;
+  --color-secondary-gold-hover: #F5A83D;
+  --color-secondary-gold-light: #FFF8E8;
+  
+  --color-neutral-900: #1A1A2E;
+  --color-neutral-700: #3D3D6B;
+  --color-neutral-500: #5D5D7D;
+  --color-neutral-300: #C5C5D0;
+  --color-neutral-100: #F5F7FA;
+  --color-neutral-50: #FAFBFC;
+  
+  --background: #ffffff;
+  --foreground: oklch(0.145 0 0);
+  --card: #ffffff;
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: #030213;
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0.0058 264.53);
+  --secondary-foreground: #030213;
+  --muted: #ececf0;
+  --muted-foreground: #717182;
+  --accent: #e9ebef;
+  --accent-foreground: #030213;
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.1);
+  --input: transparent;
+  --input-background: #f3f3f5;
+  --switch-background: #cbced4;
+  --font-weight-medium: var(--font-weight-medium);
+  --font-weight-normal: var(--font-weight-regular);
+  --font-weight-bold: var(--font-weight-bold);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: #030213;
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Religion-specific color system */
+  /* Christianity - Red for passion, sacrifice */
+  --religion-christian: #E5756E;
+  --religion-christian-light: rgba(229, 117, 110, 0.2);
+  --religion-christian-hover: #d46660;
+  
+  /* Islam - Green for harmony, growth, faith */
+  --religion-islam: #6BA96E;
+  --religion-islam-light: rgba(107, 169, 110, 0.2);
+  --religion-islam-hover: #5d9460;
+  
+  /* Hinduism - Deep Orange for spiritual energy, tradition */
+  --religion-hinduism: #F68969;
+  --religion-hinduism-light: rgba(246, 137, 105, 0.2);
+  --religion-hinduism-hover: #f4785a;
+  
+  /* Buddhism - Golden Yellow for enlightenment, wisdom, peace */
+  --religion-buddhism: #FACB6B;
+  --religion-buddhism-light: rgba(250, 203, 107, 0.2);
+  --religion-buddhism-hover: #f8c05a;
+  
+  /* Taoism - Black and White for balance, duality, simplicity */
+  --religion-taoism-dark: #5A5A5A;
+  --religion-taoism-light: #FFFFFF;
+  --religion-taoism-primary: #5A5A5A;
+  --religion-taoism-bg: rgba(90, 90, 90, 0.2);
+  --religion-taoism-hover: #4a4a4a;
+  
+  /* Shinto - Vermilion for purity, ritual, sacred space */
+  --religion-shinto: #E64A19;
+  --religion-shinto-light: rgba(230, 74, 25, 0.2);
+  --religion-shinto-hover: #D84315;
+  
+  /* Judaism - Blue for trust, tradition, depth */
+  --religion-judaism: #6394C7;
+  --religion-judaism-light: rgba(99, 148, 199, 0.2);
+  --religion-judaism-hover: #5282B5;
+  
+  /* Sikhism - Golden Saffron for courage, community, divinity */
+  --religion-sikhism: #F57F17;
+  --religion-sikhism-light: rgba(245, 127, 23, 0.2);
+  --religion-sikhism-hover: #E65100;
+  
+  /* Additional faiths using harmonious colors */
+  --religion-jainism: #B45F75;
+  --religion-jainism-light: rgba(180, 95, 117, 0.2);
+  --religion-jainism-hover: #a04f63;
+  
+  --religion-bahai: #B862C4;
+  --religion-bahai-light: rgba(184, 98, 196, 0.2);
+  --religion-bahai-hover: #a551b0;
+  
+  --religion-confucianism: #5873AD;
+  --religion-confucianism-light: rgba(88, 115, 173, 0.2);
+  --religion-confucianism-hover: #4a629a;
+  
+  --religion-polytheism: #9566B8;
+  --religion-polytheism-light: rgba(149, 102, 184, 0.2);
+  --religion-polytheism-hover: #8456a5;
+}
+
+.dark {
+  --background: oklch(0.18 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.22 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.22 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.28 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.28 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.28 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.28 0 0);
+  --input: oklch(0.28 0 0);
+  --ring: oklch(0.439 0 0);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.21 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.28 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.28 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* Religion-specific colors remain the same in dark mode */
+  /* Christianity - Red for passion, sacrifice */
+  --religion-christian: #E53935;
+  --religion-christian-light: rgba(229, 57, 53, 0.2);
+  --religion-christian-hover: #C62828;
+  
+  /* Islam - Green for harmony, growth, faith */
+  --religion-islam: #2E7D32;
+  --religion-islam-light: rgba(46, 125, 50, 0.2);
+  --religion-islam-hover: #1B5E20;
+  
+  /* Hinduism - Deep Orange for spiritual energy, tradition */
+  --religion-hinduism: #F4511E;
+  --religion-hinduism-light: rgba(244, 81, 30, 0.2);
+  --religion-hinduism-hover: #D84315;
+  
+  /* Buddhism - Golden Yellow for enlightenment, wisdom, peace */
+  --religion-buddhism: #F9A825;
+  --religion-buddhism-light: rgba(249, 168, 37, 0.2);
+  --religion-buddhism-hover: #F57F17;
+  
+  /* Taoism - Black and White for balance, duality, simplicity */
+  --religion-taoism-dark: #212121;
+  --religion-taoism-light: #FFFFFF;
+  --religion-taoism-primary: #FFFFFF; /* White primary in dark mode */
+  --religion-taoism-bg: rgba(255, 255, 255, 0.2);
+  --religion-taoism-hover: #E0E0E0;
+  
+  /* Shinto - Vermilion for purity, ritual, sacred space */
+  --religion-shinto: #E64A19;
+  --religion-shinto-light: rgba(230, 74, 25, 0.2);
+  --religion-shinto-hover: #D84315;
+  
+  /* Judaism - Blue for trust, tradition, depth */
+  --religion-judaism: #6394C7;
+  --religion-judaism-light: rgba(99, 148, 199, 0.2);
+  --religion-judaism-hover: #5282B5;
+  
+  /* Sikhism - Golden Saffron for courage, community, divinity */
+  --religion-sikhism: #F57F17;
+  --religion-sikhism-light: rgba(245, 127, 23, 0.2);
+  --religion-sikhism-hover: #E65100;
+  
+  /* Additional faiths using harmonious colors */
+  --religion-jainism: #FFB300;
+  --religion-jainism-light: rgba(255, 179, 0, 0.2);
+  --religion-jainism-hover: #FF8F00;
+  
+  --religion-bahai: #9C27B0;
+  --religion-bahai-light: rgba(156, 39, 176, 0.2);
+  --religion-bahai-hover: #7B1FA2;
+  
+  --religion-confucianism: #5D4037;
+  --religion-confucianism-light: rgba(93, 64, 55, 0.2);
+  --religion-confucianism-hover: #3E2723;
+  
+  --religion-polytheism: #F59E0B;
+  --religion-polytheism-light: rgba(245, 158, 11, 0.2);
+  --religion-polytheism-hover: #D97706;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  
+  /* Religion Color System for Tailwind */
+  --color-religion-christian: var(--religion-christian);
+  --color-religion-christian-light: var(--religion-christian-light);
+  --color-religion-christian-hover: var(--religion-christian-hover);
+  --color-religion-islam: var(--religion-islam);
+  --color-religion-islam-light: var(--religion-islam-light);
+  --color-religion-islam-hover: var(--religion-islam-hover);
+  --color-religion-hinduism: var(--religion-hinduism);
+  --color-religion-hinduism-light: var(--religion-hinduism-light);
+  --color-religion-hinduism-hover: var(--religion-hinduism-hover);
+  --color-religion-buddhism: var(--religion-buddhism);
+  --color-religion-buddhism-light: var(--religion-buddhism-light);
+  --color-religion-buddhism-hover: var(--religion-buddhism-hover);
+  --color-religion-taoism-dark: var(--religion-taoism-dark);
+  --color-religion-taoism-light: var(--religion-taoism-light);
+  --color-religion-taoism-primary: var(--religion-taoism-primary);
+  --color-religion-taoism-bg: var(--religion-taoism-bg);
+  --color-religion-taoism-hover: var(--religion-taoism-hover);
+  --color-religion-shinto: var(--religion-shinto);
+  --color-religion-shinto-light: var(--religion-shinto-light);
+  --color-religion-shinto-hover: var(--religion-shinto-hover);
+  --color-religion-judaism: var(--religion-judaism);
+  --color-religion-judaism-light: var(--religion-judaism-light);
+  --color-religion-judaism-hover: var(--religion-judaism-hover);
+  --color-religion-sikhism: var(--religion-sikhism);
+  --color-religion-sikhism-light: var(--religion-sikhism-light);
+  --color-religion-sikhism-hover: var(--religion-sikhism-hover);
+  --color-religion-jainism: var(--religion-jainism);
+  --color-religion-jainism-light: var(--religion-jainism-light);
+  --color-religion-jainism-hover: var(--religion-jainism-hover);
+  --color-religion-bahai: var(--religion-bahai);
+  --color-religion-bahai-light: var(--religion-bahai-light);
+  --color-religion-bahai-hover: var(--religion-bahai-hover);
+  --color-religion-confucianism: var(--religion-confucianism);
+  --color-religion-confucianism-light: var(--religion-confucianism-light);
+  --color-religion-confucianism-hover: var(--religion-confucianism-hover);
+  --color-religion-polytheism: var(--religion-polytheism);
+  --color-religion-polytheism-light: var(--religion-polytheism-light);
+  --color-religion-polytheism-hover: var(--religion-polytheism-hover);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Raleway', sans-serif;
+    font-weight: var(--font-weight-regular);
+    letter-spacing: var(--letter-spacing-normal);
+  }
+
+  /* No longer applying Cinzel to headings - using Raleway for all text */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Raleway', sans-serif;
+  }
+
+  /* Cosmic Background Animation for Registration Page */
+  @keyframes cosmic-drift {
+    0%, 100% {
+      transform: scale(1.3) translate(0, 0) rotate(0deg);
+    }
+    25% {
+      transform: scale(1.65) translate(-8%, -5%) rotate(1deg);
+    }
+    50% {
+      transform: scale(1.8) translate(-5%, -8%) rotate(-1deg);
+    }
+    75% {
+      transform: scale(1.55) translate(6%, -4%) rotate(0.5deg);
+    }
+  }
+
+  @keyframes cosmic-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.95;
+    }
+  }
+
+  /* Gentle Float Animation for Chakra Figure */
+  @keyframes gentle-float {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+    }
+    33% {
+      transform: translateY(-2%) scale(1.02);
+    }
+    66% {
+      transform: translateY(1%) scale(0.98);
+    }
+  }
+
+  /* Fade In Animation for Video Background */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Continuous Rotation Animation for Circle of Faiths */
+  @keyframes rotate-continuous {
+    from {
+      transform: rotate(0deg) scale(1.05);
+    }
+    to {
+      transform: rotate(360deg) scale(1.05);
+    }
+  }
+
+  /* Performance optimization for animations */
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+}
+
+@layer utilities {
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Cosmic animation for registration background */
+  .animate-cosmic-drift {
+    animation: cosmic-drift 40s ease-in-out infinite;
+  }
+
+  .animate-cosmic-pulse {
+    animation: cosmic-pulse 8s ease-in-out infinite;
+  }
+  
+  h1.alt-font, h2.alt-font, h3.alt-font, h4.alt-font, h5.alt-font, h6.alt-font {
+    font-family: 'Butler', serif !important;
+    font-weight: 700 !important;
+  }
+
+  /* Religion-specific utility classes */
+  .faith-christian {
+    @apply text-[color:var(--religion-christian)] border-[color:var(--religion-christian)];
+  }
+  
+  .faith-christian-bg {
+    background-color: var(--religion-christian-light);
+  }
+  
+  .faith-christian-button {
+    @apply bg-[color:var(--religion-christian)] hover:bg-[color:var(--religion-christian-hover)] text-white;
+  }
+
+  .faith-islam {
+    @apply text-[color:var(--religion-islam)] border-[color:var(--religion-islam)];
+  }
+  
+  .faith-islam-bg {
+    background-color: var(--religion-islam-light);
+  }
+  
+  .faith-islam-button {
+    @apply bg-[color:var(--religion-islam)] hover:bg-[color:var(--religion-islam-hover)] text-white;
+  }
+
+  .faith-hinduism {
+    @apply text-[color:var(--religion-hinduism)] border-[color:var(--religion-hinduism)];
+  }
+  
+  .faith-hinduism-bg {
+    background-color: var(--religion-hinduism-light);
+  }
+  
+  .faith-hinduism-button {
+    @apply bg-[color:var(--religion-hinduism)] hover:bg-[color:var(--religion-hinduism-hover)] text-white;
+  }
+
+  .faith-buddhism {
+    @apply text-[color:var(--religion-buddhism)] border-[color:var(--religion-buddhism)];
+  }
+  
+  .faith-buddhism-bg {
+    background-color: var(--religion-buddhism-light);
+  }
+  
+  .faith-buddhism-button {
+    @apply bg-[color:var(--religion-buddhism)] hover:bg-[color:var(--religion-buddhism-hover)] text-white;
+  }
+
+  .faith-taoism {
+    @apply text-[color:var(--religion-taoism-primary)] border-[color:var(--religion-taoism-primary)];
+  }
+  
+  .faith-taoism-bg {
+    background-color: var(--religion-taoism-bg);
+  }
+  
+  .faith-taoism-button {
+    @apply bg-[color:var(--religion-taoism-primary)] hover:bg-[color:var(--religion-taoism-hover)] text-white;
+  }
+
+  .faith-shinto {
+    @apply text-[color:var(--religion-shinto)] border-[color:var(--religion-shinto)];
+  }
+  
+  .faith-shinto-bg {
+    background-color: var(--religion-shinto-light);
+  }
+  
+  .faith-shinto-button {
+    @apply bg-[color:var(--religion-shinto)] hover:bg-[color:var(--religion-shinto-hover)] text-white;
+  }
+
+  .faith-judaism {
+    @apply text-[color:var(--religion-judaism)] border-[color:var(--religion-judaism)];
+  }
+  
+  .faith-judaism-bg {
+    background-color: var(--religion-judaism-light);
+  }
+  
+  .faith-judaism-button {
+    @apply bg-[color:var(--religion-judaism)] hover:bg-[color:var(--religion-judaism-hover)] text-white;
+  }
+
+  .faith-sikhism {
+    @apply text-[color:var(--religion-sikhism)] border-[color:var(--religion-sikhism)];
+  }
+  
+  .faith-sikhism-bg {
+    background-color: var(--religion-sikhism-light);
+  }
+  
+  .faith-sikhism-button {
+    @apply bg-[color:var(--religion-sikhism)] hover:bg-[color:var(--religion-sikhism-hover)] text-white;
+  }
+
+  .faith-jainism {
+    @apply text-[color:var(--religion-jainism)] border-[color:var(--religion-jainism)];
+  }
+  
+  .faith-jainism-bg {
+    background-color: var(--religion-jainism-light);
+  }
+  
+  .faith-jainism-button {
+    @apply bg-[color:var(--religion-jainism)] hover:bg-[color:var(--religion-jainism-hover)] text-white;
+  }
+
+  .faith-bahai {
+    @apply text-[color:var(--religion-bahai)] border-[color:var(--religion-bahai)];
+  }
+  
+  .faith-bahai-bg {
+    background-color: var(--religion-bahai-light);
+  }
+  
+  .faith-bahai-button {
+    @apply bg-[color:var(--religion-bahai)] hover:bg-[color:var(--religion-bahai-hover)] text-white;
+  }
+
+  .faith-confucianism {
+    @apply text-[color:var(--religion-confucianism)] border-[color:var(--religion-confucianism)];
+  }
+  
+  .faith-confucianism-bg {
+    background-color: var(--religion-confucianism-light);
+  }
+  
+  .faith-confucianism-button {
+    @apply bg-[color:var(--religion-confucianism)] hover:bg-[color:var(--religion-confucianism-hover)] text-white;
+  }
+
+  .faith-polytheism {
+    @apply text-[color:var(--religion-polytheism)] border-[color:var(--religion-polytheism)];
+  }
+  
+  .faith-polytheism-bg {
+    background-color: var(--religion-polytheism-light);
+  }
+  
+  .faith-polytheism-button {
+    @apply bg-[color:var(--religion-polytheism)] hover:bg-[color:var(--religion-polytheism-hover)] text-white;
+  }
+
+  /* Faith gradient utilities */
+  .faith-gradient-christian {
+    background: linear-gradient(135deg, var(--religion-christian), var(--religion-christian-hover));
+  }
+  
+  .faith-gradient-islam {
+    background: linear-gradient(135deg, var(--religion-islam), var(--religion-islam-hover));
+  }
+  
+  .faith-gradient-hinduism {
+    background: linear-gradient(135deg, var(--religion-hinduism), var(--religion-hinduism-hover));
+  }
+  
+  .faith-gradient-buddhism {
+    background: linear-gradient(135deg, var(--religion-buddhism), var(--religion-buddhism-hover));
+  }
+  
+  .faith-gradient-taoism {
+    background: linear-gradient(135deg, var(--religion-taoism-dark), var(--religion-taoism-light));
+  }
+  
+  .faith-gradient-shinto {
+    background: linear-gradient(135deg, var(--religion-shinto), var(--religion-shinto-hover));
+  }
+  
+  .faith-gradient-judaism {
+    background: linear-gradient(135deg, var(--religion-judaism), var(--religion-judaism-hover));
+  }
+  
+  .faith-gradient-sikhism {
+    background: linear-gradient(135deg, var(--religion-sikhism), var(--religion-sikhism-hover));
+  }
+  
+  .faith-gradient-jainism {
+    background: linear-gradient(135deg, var(--religion-jainism), var(--religion-jainism-hover));
+  }
+  
+  .faith-gradient-bahai {
+    background: linear-gradient(135deg, var(--religion-bahai), var(--religion-bahai-hover));
+  }
+  
+  .faith-gradient-confucianism {
+    background: linear-gradient(135deg, var(--religion-confucianism), var(--religion-confucianism-hover));
+  }
+  
+  .faith-gradient-polytheism {
+    background: linear-gradient(135deg, var(--religion-polytheism), var(--religion-polytheism-hover));
+  }
+
+  /* Cosmic Texture Background Utilities */
+  .cosmic-texture-bg {
+    position: relative;
+    background-color: #0B1426;
+  }
+
+  .cosmic-texture-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('figma:asset/36019cacf56e7cfa99c164269976900dd0d3887c.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.5;
+    z-index: 0;
+  }
+
+  .cosmic-texture-bg-subtle {
+    position: relative;
+    background-color: #0B1426;
+  }
+
+  .cosmic-texture-bg-subtle::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('figma:asset/36019cacf56e7cfa99c164269976900dd0d3887c.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.3;
+    z-index: 0;
+  }
+
+  .cosmic-texture-bg-strong {
+    position: relative;
+    background-color: #0B1426;
+  }
+
+  .cosmic-texture-bg-strong::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('figma:asset/36019cacf56e7cfa99c164269976900dd0d3887c.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.7;
+    z-index: 0;
+  }
+
+  /* Cosmic texture with gradient overlay for better text readability */
+  .cosmic-texture-bg-overlay {
+    position: relative;
+    background-color: #0B1426;
+  }
+
+  .cosmic-texture-bg-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('figma:asset/36019cacf56e7cfa99c164269976900dd0d3887c.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.5;
+    z-index: 0;
+  }
+
+  .cosmic-texture-bg-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, 
+      rgba(11, 20, 38, 0.4),
+      rgba(11, 20, 38, 0.6),
+      rgba(22, 40, 68, 0.7),
+      rgba(11, 20, 38, 0.95)
+    );
+    z-index: 1;
+  }
+
+  /* Fixed background variant for parallax-like effect */
+  .cosmic-texture-bg-fixed {
+    position: relative;
+    background-color: #0B1426;
+  }
+
+  .cosmic-texture-bg-fixed::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url('figma:asset/36019cacf56e7cfa99c164269976900dd0d3887c.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.4;
+    z-index: -1;
+  }
+
+  /* Ensure content is above the texture */
+  .cosmic-texture-bg > *,
+  .cosmic-texture-bg-subtle > *,
+  .cosmic-texture-bg-strong > *,
+  .cosmic-texture-bg-overlay > *,
+  .cosmic-texture-bg-fixed > * {
+    position: relative;
+    z-index: 10;
+  }
+  
+  /* Quick Wins Utility Classes */
+  
+  /* 1. Letter-spacing for all-caps text */
+  .uppercase {
+    letter-spacing: var(--letter-spacing-wide);
+  }
+  
+  /* 2. Max-width for text content */
+  .max-w-text {
+    max-width: var(--max-width-text);
+  }
+  
+  .max-w-content {
+    max-width: var(--max-width-content);
+  }
+  
+  /* 3. Standard border-radius */
+  .rounded-card {
+    border-radius: 1rem; /* 16px - rounded-2xl equivalent */
+  }
+  
+  /* 4. Consistent hover states */
+  .hover-lift {
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .hover-lift:hover {
+    transform: scale(1.02);
+    box-shadow: var(--elevation-hover-1);
+  }
+  
+  /* 5. Elevation system utilities */
+  .elevation-1 {
+    box-shadow: var(--elevation-1);
+  }
+  
+  .elevation-2 {
+    box-shadow: var(--elevation-2);
+  }
+  
+  .elevation-3 {
+    box-shadow: var(--elevation-3);
+  }
+  
+  .elevation-4 {
+    box-shadow: var(--elevation-4);
+  }
+  
+  .elevation-hover-1 {
+    box-shadow: var(--elevation-hover-1);
+  }
+  
+  .elevation-hover-2 {
+    box-shadow: var(--elevation-hover-2);
+  }
+  
+  /* 6. Button height utilities */
+  .btn-sm {
+    height: var(--button-height-small);
+  }
+  
+  .btn-md {
+    height: var(--button-height-medium);
+  }
+  
+  .btn-lg {
+    height: var(--button-height-large);
+  }
+  
+  /* 7. Section spacing utilities */
+  .section-spacing {
+    padding-top: var(--section-spacing-desktop);
+    padding-bottom: var(--section-spacing-desktop);
+  }
+  
+  @media (max-width: 640px) {
+    .section-spacing {
+      padding-top: var(--section-spacing-mobile);
+      padding-bottom: var(--section-spacing-mobile);
+    }
+  }
+  
+  /* 8. Light theme background utilities */
+  .bg-light {
+    background-color: #FAFBFC;
+  }
+  
+  .bg-light-gradient {
+    background: linear-gradient(to bottom, #ffffff, #F8F7FF, #ffffff);
+  }
+  
+  /* 9. Text color utilities for light theme */
+  .text-primary {
+    color: var(--color-neutral-900);
+  }
+  
+  .text-secondary {
+    color: var(--color-neutral-700);
+  }
+  
+  .text-tertiary {
+    color: var(--color-neutral-500);
+  }
+  
+  /* 10. Typography Utility Classes - Clear Type Scale */
+  .text-display {
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-display);
+    font-weight: var(--font-weight-black);
+    line-height: var(--line-height-tight);
+    letter-spacing: -0.02em;
+  }
+  
+  @media (max-width: 640px) {
+    .text-display {
+      font-size: var(--font-size-display-mobile);
+    }
+  }
+  
+  .text-h1 {
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    letter-spacing: -0.01em;
+  }
+  
+  .text-h2 {
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-normal);
+    letter-spacing: 0;
+  }
+  
+  .text-h3 {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-normal);
+    letter-spacing: 0;
+  }
+  
+  .text-h4 {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-h4);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-normal);
+    letter-spacing: 0;
+  }
+  
+  .text-body-large {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-body-large);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-relaxed);
+    letter-spacing: 0;
+  }
+  
+  .text-body {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-relaxed);
+    letter-spacing: 0;
+  }
+  
+  .text-body-small {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-body-small);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-relaxed);
+    letter-spacing: 0;
+  }
+  
+  .text-caption {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-normal);
+    letter-spacing: 0;
+  }
+  
+  /* Max-width for readable paragraphs (65-75 characters) */
+  .max-w-prose {
+    max-width: 65ch;
+  }
+  
+  .max-w-prose-wide {
+    max-width: 75ch;
+  }
+}
+
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    h1 {
+      font-family: 'Raleway', sans-serif;
+      font-size: var(--font-size-xxl);
+      font-weight: var(--font-weight-bold);
+      line-height: var(--line-height-tight);
+      letter-spacing: var(--letter-spacing-normal);
+    }
+
+    h2 {
+      font-family: 'Raleway', sans-serif;
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-semibold);
+      line-height: var(--line-height-normal);
+      letter-spacing: var(--letter-spacing-normal);
+    }
+
+    h3 {
+      font-family: 'Raleway', sans-serif;
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      line-height: var(--line-height-normal);
+      letter-spacing: var(--letter-spacing-normal);
+    }
+
+    h4 {
+      font-family: 'Raleway', sans-serif;
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--line-height-normal);
+      letter-spacing: var(--letter-spacing-normal);
+    }
+
+    p {
+      font-family: 'Raleway', sans-serif;
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-regular);
+      line-height: var(--line-height-loose);
+      letter-spacing: var(--letter-spacing-normal);
+    }
+
+    label {
+      font-family: 'Raleway', sans-serif;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--line-height-normal);
+      letter-spacing: var(--letter-spacing-normal);
+    }
+
+    button {
+      font-family: 'Raleway', sans-serif;
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--line-height-normal);
+      letter-spacing: var(--letter-spacing-normal);
+    }
+
+    input {
+      font-family: 'Raleway', sans-serif;
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-regular);
+      line-height: var(--line-height-normal);
+      letter-spacing: var(--letter-spacing-normal);
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+  /* Mobile viewport fix */
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 640px) {
+  /* Prevent iOS zoom on focus */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+  
+  /* Improve mobile scrolling performance */
+  * {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* Reduce animations on mobile for better performance */
+  .cosmic-texture-bg::before,
+  .cosmic-texture-bg-subtle::before,
+  .cosmic-texture-bg-strong::before,
+  .cosmic-texture-bg-overlay::before {
+    opacity: 0.2;
+  }
+}
