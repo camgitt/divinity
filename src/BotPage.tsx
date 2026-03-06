@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 
 const WP = "https://divinityagi.com/wp-content/uploads"
 const BOT = "https://www.divinitybot.com/assets"
@@ -8,7 +8,160 @@ function navigate(to: string) {
   window.dispatchEvent(new PopStateEvent("popstate"))
 }
 
+function useFade() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [v, setV] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) setV(true) }, { threshold: 0.06 })
+    o.observe(el)
+    return () => o.disconnect()
+  }, [])
+  return { ref, cls: `transition-all duration-700 ease-out ${v ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}` }
+}
+
+function useStagger(count: number) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [v, setV] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) setV(true) }, { threshold: 0.05 })
+    o.observe(el)
+    return () => o.disconnect()
+  }, [])
+  return {
+    ref,
+    visible: v,
+    itemCls: (i: number) =>
+      `transition-all duration-600 ease-out ${v ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`,
+    itemStyle: (i: number) => ({ transitionDelay: v ? `${i * 120}ms` : "0ms" }),
+  }
+}
+
+const CX = "max-w-7xl mx-auto px-6 sm:px-8 lg:px-12"
+
+/* ── Chat Preview ── */
+const chatMessages = [
+  { from: "bot", text: "Welcome. This is a quiet space -- no judgment, no pressure. What's on your mind today?" },
+  { from: "user", text: "I've been feeling lost lately. Like I don't know what I believe anymore." },
+  { from: "bot", text: "That's a brave thing to name. Doubt isn't the opposite of faith -- it's often the doorway to deeper understanding. Would you like to explore what's shifting for you?" },
+  { from: "user", text: "I think so. I grew up religious but it doesn't feel the same anymore." },
+  { from: "bot", text: "Growth often means outgrowing the containers we were given. That doesn't mean the essence was wrong -- just that you're ready for something bigger. What part still resonates with you?" },
+]
+
+function ChatPreview() {
+  const [visibleCount, setVisibleCount] = useState(0)
+  const ref = useRef<HTMLDivElement>(null)
+  const [started, setStarted] = useState(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) setStarted(true) }, { threshold: 0.3 })
+    o.observe(el)
+    return () => o.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!started) return
+    if (visibleCount >= chatMessages.length) return
+    const delay = visibleCount === 0 ? 400 : (chatMessages[visibleCount - 1]?.from === "bot" ? 1800 : 1200)
+    const t = setTimeout(() => setVisibleCount(c => c + 1), delay)
+    return () => clearTimeout(t)
+  }, [started, visibleCount])
+
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+  }, [visibleCount])
+
+  return (
+    <div ref={ref} className="relative max-w-lg mx-auto">
+      {/* Phone frame */}
+      <div className="relative bg-brand-900/80 backdrop-blur-xl rounded-[2rem] p-1.5 shadow-2xl shadow-brand-900/40 border border-white/10">
+        {/* Notch */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-5 bg-brand-900 rounded-b-2xl z-10" />
+        {/* Screen */}
+        <div className="bg-gradient-to-b from-brand-800 to-brand-900 rounded-[1.5rem] overflow-hidden">
+          {/* Chat header */}
+          <div className="px-5 pt-8 pb-3 border-b border-white/5">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" /></svg>
+              </div>
+              <div>
+                <p className="text-white text-sm font-semibold font-display">DivinityBot</p>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-[11px] text-white/40">Online</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Messages */}
+          <div ref={scrollRef} className="h-[340px] overflow-y-auto px-4 py-4 space-y-3 scrollbar-hide">
+            {chatMessages.slice(0, visibleCount).map((m, i) => (
+              <div key={i} className={`flex ${m.from === "user" ? "justify-end" : "justify-start"} animate-[fadeUp_0.4s_ease-out]`}>
+                <div className={`max-w-[82%] px-4 py-2.5 text-[13px] leading-relaxed ${
+                  m.from === "user"
+                    ? "bg-gold-500/90 text-white rounded-2xl rounded-br-md"
+                    : "bg-white/8 border border-white/10 text-white/85 rounded-2xl rounded-bl-md"
+                }`}>
+                  {m.text}
+                </div>
+              </div>
+            ))}
+            {visibleCount < chatMessages.length && started && (
+              <div className="flex justify-start">
+                <div className="bg-white/8 border border-white/10 rounded-2xl rounded-bl-md px-4 py-3">
+                  <div className="flex gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          {/* Input bar */}
+          <div className="px-4 pb-5 pt-2">
+            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2.5">
+              <span className="text-white/25 text-[13px] flex-1">What's on your mind?</span>
+              <div className="w-7 h-7 rounded-full bg-gold-500 flex items-center justify-center shrink-0">
+                <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Glow */}
+      <div className="absolute -inset-8 bg-gold-500/5 rounded-full blur-3xl -z-10" />
+    </div>
+  )
+}
+
+/* ── Signup Modal ── */
 const STEPS = ["Account", "Profile", "Faith", "Confirmation"] as const
+
+const faithOptions = [
+  { id: "christian", label: "Christianity", icon: "\u271D\uFE0F" },
+  { id: "jewish", label: "Judaism", icon: "\u2721\uFE0F" },
+  { id: "buddhist", label: "Buddhism", icon: "\u2638\uFE0F" },
+  { id: "confucian", label: "Confucianism", icon: "\uD83C\uDFDB\uFE0F" },
+  { id: "indigenous", label: "Indigenous", icon: "\uD83E\uDEB6" },
+  { id: "taoist", label: "Taoism", icon: "\u262F\uFE0F" },
+  { id: "bahai", label: "Bah\u00E1'\u00ED", icon: "\u2B50" },
+  { id: "polytheist", label: "Polytheism", icon: "\uD83C\uDF00" },
+  { id: "shinto", label: "Shinto", icon: "\u26E9\uFE0F" },
+  { id: "exploring", label: "Just Exploring", icon: "\uD83D\uDD0D" },
+]
+
+const seekingOptions = [
+  "Daily reflection", "Grief support", "Meditation", "Community",
+  "Scripture study", "Life guidance", "Inner peace", "Spiritual growth",
+]
 
 function SignupModal({ onClose }: { onClose: () => void }) {
   const [step, setStep] = useState(0)
@@ -19,40 +172,15 @@ function SignupModal({ onClose }: { onClose: () => void }) {
   const [pw2, setPw2] = useState("")
   const [showPw, setShowPw] = useState(false)
   const [showPw2, setShowPw2] = useState(false)
-
-  // Profile
   const [bio, setBio] = useState("")
   const [dob, setDob] = useState("")
   const [location, setLocation] = useState("")
   const [pronouns, setPronouns] = useState("")
-
-  // Faith
   const [faith, setFaith] = useState("")
   const [experience, setExperience] = useState("")
   const [seeking, setSeeking] = useState<string[]>([])
 
-  const faithOptions = [
-    { id: "christian", label: "Christianity", icon: "✝️" },
-    { id: "jewish", label: "Judaism", icon: "✡️" },
-    { id: "buddhist", label: "Buddhism", icon: "☸️" },
-    { id: "confucian", label: "Confucianism", icon: "🏛️" },
-    { id: "indigenous", label: "Indigenous", icon: "🪶" },
-    { id: "taoist", label: "Taoism", icon: "☯️" },
-    { id: "bahai", label: "Bahá'í", icon: "⭐" },
-    { id: "polytheist", label: "Polytheism", icon: "🌀" },
-    { id: "shinto", label: "Shinto", icon: "⛩️" },
-    { id: "exploring", label: "Just Exploring", icon: "🔍" },
-  ]
-
-  const seekingOptions = [
-    "Daily reflection", "Grief support", "Meditation", "Community",
-    "Scripture study", "Life guidance", "Inner peace", "Spiritual growth",
-  ]
-
   const toggleSeeking = (s: string) => setSeeking(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])
-
-  const step2Valid = true // profile is optional
-  const step3Valid = !!faith
 
   const pwChecks = useMemo(() => ({
     length: pw.length >= 8,
@@ -64,135 +192,114 @@ function SignupModal({ onClose }: { onClose: () => void }) {
   const pwValid = pwChecks.length && pwChecks.upper && pwChecks.lower && pwChecks.number
   const step1Valid = name.trim() && email.trim() && username.trim() && pwValid && pw === pw2
 
-  const CheckIcon = ({ met }: { met: boolean }) => met
-    ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-    : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9"/></svg>
+  const inputCls = "w-full h-11 px-3.5 border border-brand-200 rounded-lg font-body text-sm text-brand-700 bg-brand-50/50 outline-none transition-all focus:border-brand-400 focus:ring-2 focus:ring-brand-100 focus:bg-white placeholder:text-brand-300"
+  const labelCls = "block text-xs font-semibold text-brand-500 mb-1.5 tracking-wide"
 
   return (
-    <div className="signup-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="signup-modal">
-        <button className="signup-close" onClick={onClose} aria-label="Close">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl">
+        {/* Close */}
+        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-brand-50 text-brand-400 hover:bg-brand-100 hover:text-brand-600 flex items-center justify-center transition z-10">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
         </button>
 
-        <div className="signup-header">
-          <h2>Create Your Account</h2>
-          <p className="sub">A clear 4-step setup for first-time completion</p>
-          <p className="step-label">Step {step + 1} of {STEPS.length}</p>
-          <p className="step-back-hint">You can go back anytime</p>
-
-          <div className="signup-stepper">
+        {/* Header */}
+        <div className="pt-8 pb-4 px-7 text-center">
+          <h2 className="font-display text-2xl font-bold text-brand-700 mb-1">Create Your Account</h2>
+          <p className="text-xs text-brand-300 mb-5">Step {step + 1} of {STEPS.length}</p>
+          {/* Stepper */}
+          <div className="flex items-center justify-center gap-0 max-w-xs mx-auto">
             {STEPS.map((label, i) => (
-              <div className="stepper-item" key={label}>
-                {i < STEPS.length - 1 && <div className={`stepper-line ${i < step ? "done" : ""}`} />}
-                <div className={`stepper-dot ${i === step ? "active" : i < step ? "done" : ""}`}>
-                  {i < step ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg> : i + 1}
+              <div key={label} className="flex flex-col items-center flex-1 relative">
+                {i < STEPS.length - 1 && (
+                  <div className={`absolute top-4 left-1/2 w-full h-0.5 ${i < step ? "bg-brand-400" : "bg-brand-100"} transition-colors`} />
+                )}
+                <div className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  i === step ? "bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-md shadow-brand-500/30"
+                  : i < step ? "bg-brand-400 text-white"
+                  : "bg-brand-50 border-2 border-brand-100 text-brand-300"
+                }`}>
+                  {i < step ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6L9 17l-5-5" /></svg> : i + 1}
                 </div>
-                <span className={`stepper-label ${i === step ? "active" : ""}`}>{label}</span>
+                <span className={`text-[10px] mt-1.5 ${i === step ? "text-brand-600 font-semibold" : "text-brand-300"}`}>{label}</span>
               </div>
             ))}
           </div>
         </div>
 
+        {/* Step 0: Account */}
         {step === 0 && (
-          <>
-            <div className="signup-body">
-              <p className="intro">Start with your account details. You can review everything before submitting.</p>
-
-              <div className="form-group">
-                <label>Full Name</label>
-                <input type="text" placeholder="John Doe" value={name} onChange={e => setName(e.target.value)} />
-              </div>
-
-              <div className="form-group">
-                <label>Email</label>
-                <input type="email" placeholder="john@example.com" value={email} onChange={e => setEmail(e.target.value)} />
-                <p className="hint">We'll only use this for account and important updates.</p>
-              </div>
-
-              <div className="form-group">
-                <label>Username</label>
-                <div className="at-prefix">
-                  <input type="text" placeholder="johndoe" value={username} onChange={e => setUsername(e.target.value)} />
+          <div className="px-7 pb-7">
+            <p className="text-sm text-brand-400 mb-5">Start with your account details.</p>
+            <div className="space-y-4">
+              <div><label className={labelCls}>Full Name</label><input type="text" placeholder="John Doe" value={name} onChange={e => setName(e.target.value)} className={inputCls} /></div>
+              <div><label className={labelCls}>Email</label><input type="email" placeholder="john@example.com" value={email} onChange={e => setEmail(e.target.value)} className={inputCls} /></div>
+              <div>
+                <label className={labelCls}>Username</label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-brand-300">@</span>
+                  <input type="text" placeholder="johndoe" value={username} onChange={e => setUsername(e.target.value)} className={`${inputCls} pl-8`} />
                 </div>
-                <p className="hint">This appears in community features.</p>
               </div>
-
-              <div className="form-group">
-                <label>Password</label>
-                <div style={{ position: "relative" }}>
-                  <input type={showPw ? "text" : "password"} placeholder="Create a secure password" value={pw} onChange={e => setPw(e.target.value)} />
-                  <button type="button" onClick={() => setShowPw(!showPw)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#9ca3af", padding: 4 }} aria-label={showPw ? "Hide password" : "Show password"}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      {showPw ? <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></> : <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>}
+              <div>
+                <label className={labelCls}>Password</label>
+                <div className="relative">
+                  <input type={showPw ? "text" : "password"} placeholder="Create a secure password" value={pw} onChange={e => setPw(e.target.value)} className={`${inputCls} pr-10`} />
+                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-300 hover:text-brand-500 transition">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      {showPw ? <><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" /><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" /><line x1="1" y1="1" x2="23" y2="23" /></> : <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></>}
                     </svg>
                   </button>
                 </div>
-                <div className="pw-reqs">
-                  <span className={`pw-req ${pwChecks.length ? "met" : ""}`}><CheckIcon met={pwChecks.length} /> 8+ characters</span>
-                  <span className={`pw-req ${pwChecks.upper ? "met" : ""}`}><CheckIcon met={pwChecks.upper} /> One uppercase</span>
-                  <span className={`pw-req ${pwChecks.lower ? "met" : ""}`}><CheckIcon met={pwChecks.lower} /> One lowercase</span>
-                  <span className={`pw-req ${pwChecks.number ? "met" : ""}`}><CheckIcon met={pwChecks.number} /> One number</span>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+                  {[
+                    { met: pwChecks.length, label: "8+ characters" },
+                    { met: pwChecks.upper, label: "Uppercase" },
+                    { met: pwChecks.lower, label: "Lowercase" },
+                    { met: pwChecks.number, label: "Number" },
+                  ].map(c => (
+                    <span key={c.label} className={`text-[11px] flex items-center gap-1 ${c.met ? "text-green-600" : "text-brand-300"}`}>
+                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">{c.met ? <path d="M20 6L9 17l-5-5" /> : <circle cx="12" cy="12" r="9" />}</svg>
+                      {c.label}
+                    </span>
+                  ))}
                 </div>
               </div>
-
-              <div className="form-group">
-                <label>Confirm Password</label>
-                <div style={{ position: "relative" }}>
-                  <input type={showPw2 ? "text" : "password"} placeholder="Re-enter your password" value={pw2} onChange={e => setPw2(e.target.value)} />
-                  <button type="button" onClick={() => setShowPw2(!showPw2)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#9ca3af", padding: 4 }} aria-label={showPw2 ? "Hide password" : "Show password"}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      {showPw2 ? <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></> : <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>}
+              <div>
+                <label className={labelCls}>Confirm Password</label>
+                <div className="relative">
+                  <input type={showPw2 ? "text" : "password"} placeholder="Re-enter your password" value={pw2} onChange={e => setPw2(e.target.value)} className={`${inputCls} pr-10`} />
+                  <button type="button" onClick={() => setShowPw2(!showPw2)} className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-300 hover:text-brand-500 transition">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      {showPw2 ? <><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" /><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" /><line x1="1" y1="1" x2="23" y2="23" /></> : <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></>}
                     </svg>
                   </button>
                 </div>
-                {pw2 && pw !== pw2 && <p className="hint" style={{ color: "#ef4444" }}>Passwords do not match.</p>}
+                {pw2 && pw !== pw2 && <p className="text-[11px] text-red-500 mt-1">Passwords do not match.</p>}
               </div>
             </div>
-
-            <div className="signup-footer">
-              <button className="btn-back" onClick={onClose}>Back</button>
-              <button className="btn-continue" disabled={!step1Valid} onClick={() => setStep(1)}>Continue</button>
+            <div className="flex gap-3 mt-6">
+              <button onClick={onClose} className="flex-1 h-11 border border-brand-200 rounded-lg text-sm font-semibold text-brand-500 hover:bg-brand-50 transition">Back</button>
+              <button disabled={!step1Valid} onClick={() => setStep(1)} className="flex-[2] h-11 bg-gradient-to-r from-brand-500 to-brand-700 text-white rounded-lg text-sm font-bold tracking-wide shadow-md shadow-brand-500/20 hover:shadow-lg hover:-translate-y-px transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none">Continue</button>
             </div>
-          </>
+          </div>
         )}
 
+        {/* Step 1: Profile */}
         {step === 1 && (
-          <>
-            <div className="signup-body">
-              <p className="intro">Tell us a bit about yourself so we can personalize your experience. All fields are optional.</p>
-
-              <div className="form-group">
-                <label>Bio</label>
-                <textarea
-                  placeholder="A little about your spiritual journey..."
-                  value={bio}
-                  onChange={e => setBio(e.target.value)}
-                  maxLength={200}
-                  style={{ width: "100%", minHeight: 80, padding: "0.625rem 0.875rem", border: "1px solid #d1d5db", borderRadius: "0.5rem", fontFamily: "'Raleway', sans-serif", fontSize: 14, color: "#111", background: "#f9fafb", outline: "none", resize: "vertical", transition: "all 0.2s" }}
-                />
-                <p className="hint">{bio.length}/200 characters</p>
+          <div className="px-7 pb-7">
+            <p className="text-sm text-brand-400 mb-5">Tell us about yourself. All fields are optional.</p>
+            <div className="space-y-4">
+              <div>
+                <label className={labelCls}>Bio</label>
+                <textarea placeholder="A little about your spiritual journey..." value={bio} onChange={e => setBio(e.target.value)} maxLength={200} className="w-full min-h-[80px] px-3.5 py-2.5 border border-brand-200 rounded-lg font-body text-sm text-brand-700 bg-brand-50/50 outline-none transition-all focus:border-brand-400 focus:ring-2 focus:ring-brand-100 focus:bg-white placeholder:text-brand-300 resize-vertical" />
+                <p className="text-[11px] text-brand-300 mt-1">{bio.length}/200</p>
               </div>
-
-              <div className="form-group">
-                <label>Date of Birth</label>
-                <input type="date" value={dob} onChange={e => setDob(e.target.value)} />
-                <p className="hint">Used to personalize your experience. Never shared publicly.</p>
-              </div>
-
-              <div className="form-group">
-                <label>Location</label>
-                <input type="text" placeholder="City, Country" value={location} onChange={e => setLocation(e.target.value)} />
-                <p className="hint">Helps us suggest local faith communities.</p>
-              </div>
-
-              <div className="form-group">
-                <label>Pronouns</label>
-                <select
-                  value={pronouns}
-                  onChange={e => setPronouns(e.target.value)}
-                  style={{ width: "100%", height: 42, padding: "0 0.875rem", border: "1px solid #d1d5db", borderRadius: "0.5rem", fontFamily: "'Raleway', sans-serif", fontSize: 14, color: pronouns ? "#111" : "#9ca3af", background: "#f9fafb", outline: "none", cursor: "pointer" }}
-                >
+              <div><label className={labelCls}>Date of Birth</label><input type="date" value={dob} onChange={e => setDob(e.target.value)} className={inputCls} /></div>
+              <div><label className={labelCls}>Location</label><input type="text" placeholder="City, Country" value={location} onChange={e => setLocation(e.target.value)} className={inputCls} /></div>
+              <div>
+                <label className={labelCls}>Pronouns</label>
+                <select value={pronouns} onChange={e => setPronouns(e.target.value)} className={`${inputCls} cursor-pointer ${!pronouns ? "text-brand-300" : ""}`}>
                   <option value="" disabled>Select pronouns</option>
                   <option value="he/him">He / Him</option>
                   <option value="she/her">She / Her</option>
@@ -201,667 +308,401 @@ function SignupModal({ onClose }: { onClose: () => void }) {
                 </select>
               </div>
             </div>
-            <div className="signup-footer">
-              <button className="btn-back" onClick={() => setStep(0)}>Back</button>
-              <button className="btn-continue" onClick={() => setStep(2)}>Continue</button>
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setStep(0)} className="flex-1 h-11 border border-brand-200 rounded-lg text-sm font-semibold text-brand-500 hover:bg-brand-50 transition">Back</button>
+              <button onClick={() => setStep(2)} className="flex-[2] h-11 bg-gradient-to-r from-brand-500 to-brand-700 text-white rounded-lg text-sm font-bold tracking-wide shadow-md shadow-brand-500/20 hover:shadow-lg hover:-translate-y-px transition-all">Continue</button>
             </div>
-          </>
+          </div>
         )}
 
+        {/* Step 2: Faith */}
         {step === 2 && (
-          <>
-            <div className="signup-body">
-              <p className="intro">Choose your faith tradition or explore freely — no commitment required.</p>
-
-              <div className="form-group">
-                <label>Faith Tradition</label>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", marginTop: "0.25rem" }}>
+          <div className="px-7 pb-7">
+            <p className="text-sm text-brand-400 mb-5">Choose your tradition or explore freely.</p>
+            <div className="space-y-5">
+              <div>
+                <label className={labelCls}>Faith Tradition</label>
+                <div className="grid grid-cols-2 gap-2 mt-1">
                   {faithOptions.map(f => (
-                    <button
-                      key={f.id}
-                      type="button"
-                      onClick={() => setFaith(f.id)}
-                      style={{
-                        display: "flex", alignItems: "center", gap: "0.5rem",
-                        padding: "0.625rem 0.75rem", borderRadius: "0.5rem",
-                        border: faith === f.id ? "2px solid #497EBC" : "1px solid #d1d5db",
-                        background: faith === f.id ? "rgba(73,126,188,0.06)" : "#f9fafb",
-                        cursor: "pointer", transition: "all 0.2s",
-                        fontFamily: "'Raleway', sans-serif", fontSize: 13, color: "#374151",
-                        textAlign: "left",
-                      }}
-                    >
-                      <span style={{ fontSize: 18 }}>{f.icon}</span>
-                      <span style={{ fontWeight: faith === f.id ? 600 : 400 }}>{f.label}</span>
+                    <button key={f.id} type="button" onClick={() => setFaith(f.id)} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-left text-[13px] transition-all ${
+                      faith === f.id
+                        ? "border-2 border-brand-400 bg-brand-50 text-brand-700 font-semibold"
+                        : "border border-brand-100 bg-brand-50/30 text-brand-500 hover:border-brand-200"
+                    }`}>
+                      <span className="text-lg">{f.icon}</span>
+                      {f.label}
                     </button>
                   ))}
                 </div>
               </div>
-
-              <div className="form-group">
-                <label>Experience Level</label>
-                <select
-                  value={experience}
-                  onChange={e => setExperience(e.target.value)}
-                  style={{ width: "100%", height: 42, padding: "0 0.875rem", border: "1px solid #d1d5db", borderRadius: "0.5rem", fontFamily: "'Raleway', sans-serif", fontSize: 14, color: experience ? "#111" : "#9ca3af", background: "#f9fafb", outline: "none", cursor: "pointer" }}
-                >
+              <div>
+                <label className={labelCls}>Experience Level</label>
+                <select value={experience} onChange={e => setExperience(e.target.value)} className={`${inputCls} cursor-pointer ${!experience ? "text-brand-300" : ""}`}>
                   <option value="" disabled>How familiar are you?</option>
-                  <option value="new">New — just starting to explore</option>
-                  <option value="some">Some background — know the basics</option>
-                  <option value="practicing">Practicing — active in my faith</option>
-                  <option value="deep">Deep — lifelong practitioner or scholar</option>
+                  <option value="new">New -- just starting to explore</option>
+                  <option value="some">Some background -- know the basics</option>
+                  <option value="practicing">Practicing -- active in my faith</option>
+                  <option value="deep">Deep -- lifelong practitioner or scholar</option>
                 </select>
               </div>
-
-              <div className="form-group">
-                <label>What are you seeking?</label>
-                <p className="hint" style={{ marginBottom: "0.5rem" }}>Select all that apply.</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+              <div>
+                <label className={labelCls}>What are you seeking?</label>
+                <div className="flex flex-wrap gap-2 mt-1">
                   {seekingOptions.map(s => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => toggleSeeking(s)}
-                      style={{
-                        padding: "0.4rem 0.85rem", borderRadius: "2rem",
-                        border: seeking.includes(s) ? "1.5px solid #497EBC" : "1px solid #d1d5db",
-                        background: seeking.includes(s) ? "rgba(73,126,188,0.08)" : "#fff",
-                        color: seeking.includes(s) ? "#1e386e" : "#6b7280",
-                        fontFamily: "'Raleway', sans-serif", fontSize: 12, fontWeight: seeking.includes(s) ? 600 : 400,
-                        cursor: "pointer", transition: "all 0.2s",
-                      }}
-                    >
-                      {s}
-                    </button>
+                    <button key={s} type="button" onClick={() => toggleSeeking(s)} className={`px-3 py-1.5 rounded-full text-xs transition-all ${
+                      seeking.includes(s)
+                        ? "border-2 border-brand-400 bg-brand-50 text-brand-700 font-semibold"
+                        : "border border-brand-100 text-brand-400 hover:border-brand-200"
+                    }`}>{s}</button>
                   ))}
                 </div>
               </div>
             </div>
-            <div className="signup-footer">
-              <button className="btn-back" onClick={() => setStep(1)}>Back</button>
-              <button className="btn-continue" disabled={!step3Valid} onClick={() => setStep(3)}>Continue</button>
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setStep(1)} className="flex-1 h-11 border border-brand-200 rounded-lg text-sm font-semibold text-brand-500 hover:bg-brand-50 transition">Back</button>
+              <button disabled={!faith} onClick={() => setStep(3)} className="flex-[2] h-11 bg-gradient-to-r from-brand-500 to-brand-700 text-white rounded-lg text-sm font-bold tracking-wide shadow-md shadow-brand-500/20 hover:shadow-lg hover:-translate-y-px transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none">Continue</button>
             </div>
-          </>
+          </div>
         )}
 
+        {/* Step 3: Confirmation */}
         {step === 3 && (
-          <>
-            <div className="signup-body">
-              <p className="intro">Review your details and confirm your account.</p>
-
-              {/* Account summary */}
-              <div style={{ fontFamily: "'Raleway', sans-serif", fontSize: 13, color: "#374151", padding: "1.25rem", background: "#f9fafb", borderRadius: "0.5rem", marginBottom: "0.75rem", border: "1px solid #e5e7eb" }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af", letterSpacing: "0.06em", marginBottom: "0.5rem" }}>ACCOUNT</div>
-                <div style={{ lineHeight: 1.9 }}>
-                  <div><strong>Name:</strong> {name}</div>
-                  <div><strong>Email:</strong> {email}</div>
-                  <div><strong>Username:</strong> @{username}</div>
+          <div className="px-7 pb-7">
+            <p className="text-sm text-brand-400 mb-5">Review your details and confirm.</p>
+            <div className="space-y-3">
+              {[
+                { title: "ACCOUNT", editStep: 0, rows: [["Name", name], ["Email", email], ["Username", `@${username}`]] },
+                { title: "PROFILE", editStep: 1, rows: bio || dob || location || pronouns ? [[bio && "Bio", bio], [dob && "Date of Birth", dob], [location && "Location", location], [pronouns && "Pronouns", pronouns]].filter(r => r[0]) as string[][] : [["", "No profile details added"]] },
+                { title: "FAITH", editStep: 2, rows: [["Tradition", `${faithOptions.find(f => f.id === faith)?.icon || ""} ${faithOptions.find(f => f.id === faith)?.label || "--"}`], experience ? ["Experience", experience] : null, seeking.length ? ["Seeking", seeking.join(", ")] : null].filter(Boolean) as string[][] },
+              ].map(section => (
+                <div key={section.title} className="p-4 bg-brand-50/60 rounded-xl border border-brand-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold text-brand-300 tracking-widest">{section.title}</span>
+                    <button onClick={() => setStep(section.editStep)} className="text-[11px] font-semibold text-brand-400 hover:text-brand-600 transition">Edit</button>
+                  </div>
+                  <div className="space-y-1">
+                    {section.rows.map((r, i) => (
+                      <p key={i} className="text-[13px] text-brand-600">{r[0] ? <><strong className="text-brand-700">{r[0]}:</strong> {r[1]}</> : <span className="text-brand-300 italic">{r[1]}</span>}</p>
+                    ))}
+                  </div>
                 </div>
-                <button type="button" onClick={() => setStep(0)} style={{ marginTop: "0.5rem", background: "none", border: "none", color: "#497EBC", fontFamily: "'Raleway', sans-serif", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: 0 }}>Edit</button>
-              </div>
-
-              {/* Profile summary */}
-              <div style={{ fontFamily: "'Raleway', sans-serif", fontSize: 13, color: "#374151", padding: "1.25rem", background: "#f9fafb", borderRadius: "0.5rem", marginBottom: "0.75rem", border: "1px solid #e5e7eb" }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af", letterSpacing: "0.06em", marginBottom: "0.5rem" }}>PROFILE</div>
-                <div style={{ lineHeight: 1.9 }}>
-                  {bio && <div><strong>Bio:</strong> {bio}</div>}
-                  {dob && <div><strong>Date of Birth:</strong> {dob}</div>}
-                  {location && <div><strong>Location:</strong> {location}</div>}
-                  {pronouns && <div><strong>Pronouns:</strong> {pronouns}</div>}
-                  {!bio && !dob && !location && !pronouns && <div style={{ color: "#9ca3af", fontStyle: "italic" }}>No profile details added</div>}
-                </div>
-                <button type="button" onClick={() => setStep(1)} style={{ marginTop: "0.5rem", background: "none", border: "none", color: "#497EBC", fontFamily: "'Raleway', sans-serif", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: 0 }}>Edit</button>
-              </div>
-
-              {/* Faith summary */}
-              <div style={{ fontFamily: "'Raleway', sans-serif", fontSize: 13, color: "#374151", padding: "1.25rem", background: "#f9fafb", borderRadius: "0.5rem", marginBottom: "0.5rem", border: "1px solid #e5e7eb" }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af", letterSpacing: "0.06em", marginBottom: "0.5rem" }}>FAITH</div>
-                <div style={{ lineHeight: 1.9 }}>
-                  <div><strong>Tradition:</strong> {faithOptions.find(f => f.id === faith)?.icon} {faithOptions.find(f => f.id === faith)?.label || "—"}</div>
-                  {experience && <div><strong>Experience:</strong> {experience}</div>}
-                  {seeking.length > 0 && <div><strong>Seeking:</strong> {seeking.join(", ")}</div>}
-                </div>
-                <button type="button" onClick={() => setStep(2)} style={{ marginTop: "0.5rem", background: "none", border: "none", color: "#497EBC", fontFamily: "'Raleway', sans-serif", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: 0 }}>Edit</button>
-              </div>
+              ))}
             </div>
-            <div className="signup-footer">
-              <button className="btn-back" onClick={() => setStep(2)}>Back</button>
-              <button className="btn-continue" onClick={onClose}>Create Account</button>
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setStep(2)} className="flex-1 h-11 border border-brand-200 rounded-lg text-sm font-semibold text-brand-500 hover:bg-brand-50 transition">Back</button>
+              <button onClick={onClose} className="flex-[2] h-11 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-lg text-sm font-bold tracking-wide shadow-md shadow-gold-500/20 hover:shadow-lg hover:-translate-y-px transition-all">Create Account</button>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>
   )
 }
 
+/* ══════════════════════════════════════════
+   BOT PAGE
+══════════════════════════════════════════ */
 export default function BotPage() {
-  const [loaded, setLoaded] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [showSignup, setShowSignup] = useState(false)
 
   useEffect(() => {
     window.scrollTo(0, 0)
-    requestAnimationFrame(() => setLoaded(true))
     const h = () => setScrolled(window.scrollY > 60)
     window.addEventListener("scroll", h, { passive: true })
     return () => window.removeEventListener("scroll", h)
   }, [])
 
+  const f1 = useFade()
+  const f2 = useFade()
+  const f3 = useFade()
+  const f4 = useFade()
+  const f5 = useFade()
+  const f6 = useFade()
+  const stag = useStagger(4)
+
   return (
-    <>
-      <style>{`
-        .bot-page *, .bot-page *::before, .bot-page *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        .bot-page { font-family: 'Raleway', sans-serif; background: #fff; color: #111; overflow-x: hidden; min-height: 100vh; }
-        .bot-page .hero-outer { position: relative; background: #fff; overflow-x: hidden; }
-        .bot-page .hero-tint { position: fixed; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none; z-index: 5; }
-        .bot-page .hero-inner { position: relative; min-height: 100vh; display: flex; flex-direction: column; }
-        .bot-page .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
-        .bot-page .hero-logo-wrap { position: relative; z-index: 10; width: 100%; padding: 4rem 1rem 0.5rem; text-align: center; }
-        .bot-page .hero-logo-wrap img { width: 280px; height: auto; margin: 0 auto; display: block; }
-        @media (min-width: 640px) { .bot-page .hero-logo-wrap img { width: 380px; } }
-        @media (min-width: 768px) { .bot-page .hero-logo-wrap img { width: 480px; } }
-        @media (min-width: 1024px) { .bot-page .hero-logo-wrap img { width: 550px; } }
-        .bot-page .hero-tagline-wrap { position: relative; z-index: 10; flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 1rem; margin-bottom: 30vh; }
-        .bot-page .hero-tagline { color: #fff; text-align: center; font-family: 'Raleway', sans-serif; font-weight: 500; letter-spacing: 0.025em; font-style: italic; font-size: 20px; padding: 0 40px; text-shadow: 0 2px 4px rgba(0,0,0,0.4); }
-        .bot-page .cta-bar { position: fixed; bottom: 1.5rem; left: 0; right: 0; z-index: 20; padding: 0 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.625rem; }
-        @media (min-width: 640px) { .bot-page .cta-bar { bottom: 2rem; padding: 0 1.5rem; } }
-        .bot-page .btn-checkin { position: relative; width: 100%; max-width: 340px; height: 42px; display: flex; align-items: center; justify-content: center; gap: 0.5rem; border-radius: 0.5rem; background: rgba(0,0,0,0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); color: #fff; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .bot-page .btn-checkin:hover { background: rgba(0,0,0,0.5); box-shadow: 0 10px 15px rgba(0,0,0,0.2); transform: translateY(-1px); }
-        .bot-page .btn-checkin:active { transform: scale(0.95); }
-        .bot-page .btn-checkin .heart-svg { width: 16px; height: 16px; fill: #C9A882; stroke: #C9A882; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
-        .bot-page .btn-checkin span { font-family: 'Raleway', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; }
-        @media (min-width: 640px) { .bot-page .btn-checkin span { font-size: 14px; } }
-        .bot-page .cta-btn-row { width: 100%; max-width: 340px; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-        .bot-page .btn-gold { position: relative; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem; background: linear-gradient(to right, #b69e60, #a08e54); color: #fff; border: none; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; }
-        .bot-page .btn-gold:hover { background: linear-gradient(to right, #a58d55, #8f7c4a); box-shadow: 0 10px 15px rgba(0,0,0,0.2); transform: translateY(-1px); }
-        .bot-page .btn-gold:active { transform: scale(0.95); }
-        .bot-page .btn-gold-sheen { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent, rgba(0,0,0,0.1)); border-radius: 0.5rem; }
-        .bot-page .btn-gold span { position: relative; font-family: 'Raleway', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-shadow: 0 1px 2px rgba(0,0,0,0.2); color: #fff; }
-        @media (min-width: 640px) { .bot-page .btn-gold span { font-size: 14px; } }
-        .bot-page .content-sections { position: relative; background: #e9f2f8; }
-        .bot-page section { background: #e9f2f8; }
-        .bot-page .ways-section { padding: 4rem 1rem; max-width: 72rem; margin: 0 auto; }
-        @media (min-width: 640px) { .bot-page .ways-section { padding: 5rem 1rem; } }
-        .bot-page .section-h2 { text-align: center; font-family: 'Playfair Display', serif; font-size: 32px; color: #1e386e; margin-bottom: 3rem; }
-        @media (min-width: 640px) { .bot-page .section-h2 { font-size: 40px; } }
-        .bot-page .ways-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 56rem; margin: 0 auto; }
-        @media (min-width: 640px) { .bot-page .ways-grid { grid-template-columns: 1fr 1fr; } }
-        .bot-page .way-card { background: rgba(255,255,255,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(73,126,188,0.2); border-radius: 0.75rem; padding: 1.5rem; transition: all 0.3s; cursor: pointer; }
-        .bot-page .way-card:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.1); transform: translateY(-2px); border-color: rgba(73,126,188,0.4); }
-        .bot-page .card-icon { margin-bottom: 1rem; color: #497EBC; }
-        .bot-page .card-icon svg { width: 24px; height: 24px; stroke: #497EBC; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .bot-page .card-h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: #1e386e; margin-bottom: 0.5rem; }
-        .bot-page .card-p { font-family: 'Raleway', sans-serif; font-size: 15px; color: #374151; line-height: 1.625; }
-        .bot-page .how-section { padding: 4rem 1rem; background: #e9f2f8; }
-        @media (min-width: 640px) { .bot-page .how-section { padding: 5rem 1rem; } }
-        .bot-page .how-inner { max-width: 56rem; margin: 0 auto; }
-        .bot-page .steps-wrap { display: flex; flex-direction: column; gap: 2rem; }
-        .bot-page .step { display: flex; gap: 1.5rem; align-items: flex-start; }
-        .bot-page .step-num { flex-shrink: 0; width: 3rem; height: 3rem; border-radius: 50%; background: linear-gradient(135deg, #497EBC, #1E3A5F); color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Raleway', sans-serif; font-weight: 600; font-size: 18px; box-shadow: 0 4px 12px rgba(73,126,188,0.3); }
-        .bot-page .step h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: #1e386e; margin-bottom: 0.25rem; }
-        .bot-page .step p { font-family: 'Raleway', sans-serif; font-size: 15px; color: #374151; line-height: 1.625; }
-        .bot-page .is-section { padding: 4rem 1rem; max-width: 56rem; margin: 0 auto; background: #e9f2f8; }
-        @media (min-width: 640px) { .bot-page .is-section { padding: 5rem 1rem; } }
-        .bot-page .is-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-        @media (min-width: 768px) { .bot-page .is-grid { grid-template-columns: 1fr 1fr; } }
-        .bot-page .is-card { border-radius: 0.75rem; padding: 2rem; border: 1px solid rgba(73,126,188,0.2); transition: all 0.3s; }
-        .bot-page .is-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
-        .bot-page .is-card.tinted { background: rgba(73,126,188,0.05); }
-        .bot-page .is-card.white { background: rgba(255,255,255,0.6); backdrop-filter: blur(8px); }
-        .bot-page .is-card h3 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 1rem; }
-        .bot-page .is-card.tinted h3 { color: #497EBC; }
-        .bot-page .is-card.white h3 { color: #1e386e; }
-        .bot-page .is-card p { font-family: 'Raleway', sans-serif; font-size: 15px; color: #374151; line-height: 1.625; }
-        .bot-page .privacy-section { padding: 4rem 1rem; background: #e9f2f8; }
-        @media (min-width: 640px) { .bot-page .privacy-section { padding: 5rem 1rem; } }
-        .bot-page .privacy-inner { max-width: 48rem; margin: 0 auto; text-align: center; }
-        .bot-page .shield-icon { display: block; margin: 0 auto 1.5rem; width: 40px; height: 40px; stroke: #497EBC; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .bot-page .privacy-inner h2 { font-family: 'Playfair Display', serif; font-size: 32px; color: #1e386e; margin-bottom: 1.5rem; }
-        @media (min-width: 640px) { .bot-page .privacy-inner h2 { font-size: 40px; } }
-        .bot-page .privacy-inner p { font-family: 'Raleway', sans-serif; font-size: 16px; color: #374151; line-height: 1.7; margin-bottom: 1rem; }
-        .bot-page .privacy-inner p.small { font-size: 15px; color: #4b5563; }
-        .bot-page .faq-section { padding: 4rem 1rem; max-width: 48rem; margin: 50px 0 -67px; background: #e9f2f8; }
-        @media (min-width: 640px) { .bot-page .faq-section { padding: 5rem 1rem; } }
-        .bot-page .faq-section h2 { text-align: center; font-family: 'Playfair Display', serif; font-size: 32px; color: #1e386e; margin-bottom: 3rem; }
-        @media (min-width: 640px) { .bot-page .faq-section h2 { font-size: 40px; } }
-        .bot-page .faq-list { display: flex; flex-direction: column; gap: 1.5rem; }
-        .bot-page .faq-item { border-bottom: 1px solid #e5e7eb; padding-bottom: 1.5rem; transition: all 0.3s; }
-        .bot-page .faq-item:hover { padding-left: 0.5rem; }
-        .bot-page .faq-item:last-child { border-bottom: none; }
-        .bot-page .faq-item h3 { font-family: 'Playfair Display', serif; font-size: 18px; color: #1e386e; margin-bottom: 0.5rem; }
-        .bot-page .faq-item p { font-family: 'Raleway', sans-serif; font-size: 15px; color: #374151; line-height: 1.625; }
-        .bot-page .logo-break { padding: 8rem 1rem 1rem; max-width: 42rem; margin: 0 auto; position: relative; z-index: 20; display: flex; justify-content: center; background: #e9f2f8; }
-        @media (min-width: 640px) { .bot-page .logo-break { padding: 10rem 1rem 1.5rem; } }
-        .bot-page .logo-break img { width: 100%; max-width: 32rem; height: auto; object-fit: contain; padding: 0 2rem; }
-        .bot-page .ready-section { position: relative; min-height: 100vh; width: 100%; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5rem; margin-top: -8rem; background: #e9f2f8; }
-        @media (min-width: 640px) { .bot-page .ready-section { padding-bottom: 8rem; } }
-        .bot-page .ready-video-wrap { position: absolute; inset: 0; width: 100%; height: 100%; }
-        .bot-page .ready-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
-        .bot-page .ready-content { position: relative; z-index: 10; width: 100%; max-width: 42rem; margin: 74px 0; padding: 0 1rem; text-align: center; }
-        .bot-page .ready-text-inner { padding: 51px 103px; }
-        @media (max-width: 640px) { .bot-page .ready-text-inner { padding: 2rem 1.5rem; } }
-        .bot-page .ready-content h2 { font-family: 'Playfair Display', serif; font-size: 36px; color: #fff; margin-bottom: 1.5rem; text-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-        @media (min-width: 640px) { .bot-page .ready-content h2 { font-size: 48px; } }
-        @media (min-width: 768px) { .bot-page .ready-content h2 { font-size: 56px; } }
-        .bot-page .ready-content p { font-family: 'Raleway', sans-serif; font-size: 18px; color: rgba(255,255,255,0.95); text-shadow: 0 2px 8px rgba(0,0,0,0.5); max-width: 36rem; margin: 0 auto; padding: 0 7px; }
-        @media (min-width: 640px) { .bot-page .ready-content p { font-size: 20px; } }
-        .bot-page .scroll-top-btn { position: fixed; bottom: 6rem; right: 2rem; width: 3rem; height: 3rem; background: linear-gradient(to right, #497EBC, #1E3A5F); color: #fff; border: 1px solid rgba(73,126,188,0.3); border-radius: 50%; box-shadow: 0 10px 15px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 40; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: all 0.3s; }
-        .bot-page .scroll-top-btn:hover { background: linear-gradient(to right, #3A6BA5, #497EBC); transform: translateY(-2px) scale(1.1); box-shadow: 0 15px 20px rgba(0,0,0,0.25); }
-        .bot-page .scroll-top-btn svg { width: 20px; height: 20px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-        /* signup modal */
-        .bot-page .signup-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 1rem; }
-        .bot-page .signup-modal { position: relative; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; background: #fff; border-radius: 1rem; box-shadow: 0 25px 60px rgba(0,0,0,0.3); }
-        .bot-page .signup-header { padding: 2rem 2rem 0; text-align: center; }
-        .bot-page .signup-header h2 { font-family: 'Playfair Display', serif; font-size: 26px; color: #1e386e; margin-bottom: 0.25rem; }
-        .bot-page .signup-header p.sub { font-family: 'Raleway', sans-serif; font-size: 13px; color: #6b7280; margin-bottom: 1.5rem; }
-        .bot-page .signup-header .step-label { font-family: 'Raleway', sans-serif; font-size: 12px; color: #9ca3af; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
-        .bot-page .signup-header .step-back-hint { font-family: 'Raleway', sans-serif; font-size: 11px; color: #c9a882; margin-bottom: 1.25rem; }
-        .bot-page .signup-stepper { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 1.5rem; padding: 0 1rem; }
-        .bot-page .stepper-item { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; }
-        .bot-page .stepper-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Raleway', sans-serif; font-size: 13px; font-weight: 700; transition: all 0.3s; border: 2px solid #e5e7eb; background: #fff; color: #9ca3af; z-index: 2; }
-        .bot-page .stepper-dot.active { background: linear-gradient(135deg, #497EBC, #1E3A5F); border-color: #497EBC; color: #fff; box-shadow: 0 2px 8px rgba(73,126,188,0.3); }
-        .bot-page .stepper-dot.done { background: #497EBC; border-color: #497EBC; color: #fff; }
-        .bot-page .stepper-label { font-family: 'Raleway', sans-serif; font-size: 11px; color: #9ca3af; margin-top: 0.35rem; letter-spacing: 0.02em; }
-        .bot-page .stepper-label.active { color: #1e386e; font-weight: 600; }
-        .bot-page .stepper-line { position: absolute; top: 16px; left: 50%; width: 100%; height: 2px; background: #e5e7eb; z-index: 1; }
-        .bot-page .stepper-line.done { background: #497EBC; }
-        .bot-page .signup-body { padding: 0 2rem 1.5rem; }
-        .bot-page .signup-body .intro { font-family: 'Raleway', sans-serif; font-size: 13px; color: #6b7280; line-height: 1.5; margin-bottom: 1.25rem; }
-        .bot-page .form-group { margin-bottom: 1rem; }
-        .bot-page .form-group label { display: block; font-family: 'Raleway', sans-serif; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 0.35rem; letter-spacing: 0.02em; }
-        .bot-page .form-group input { width: 100%; height: 42px; padding: 0 0.875rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-family: 'Raleway', sans-serif; font-size: 14px; color: #111; background: #f9fafb; outline: none; transition: all 0.2s; }
-        .bot-page .form-group input:focus { border-color: #497EBC; box-shadow: 0 0 0 3px rgba(73,126,188,0.1); background: #fff; }
-        .bot-page .form-group input::placeholder { color: #9ca3af; }
-        .bot-page .form-group .hint { font-family: 'Raleway', sans-serif; font-size: 11px; color: #9ca3af; margin-top: 0.3rem; }
-        .bot-page .form-group .at-prefix { position: relative; }
-        .bot-page .form-group .at-prefix input { padding-left: 2rem; }
-        .bot-page .form-group .at-prefix::before { content: '@'; position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%); font-family: 'Raleway', sans-serif; font-size: 14px; color: #9ca3af; pointer-events: none; }
-        .bot-page .pw-reqs { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin-top: 0.5rem; margin-bottom: 0.25rem; }
-        .bot-page .pw-req { font-family: 'Raleway', sans-serif; font-size: 11px; color: #9ca3af; display: flex; align-items: center; gap: 0.3rem; transition: color 0.2s; }
-        .bot-page .pw-req.met { color: #16a34a; }
-        .bot-page .pw-req svg { width: 14px; height: 14px; flex-shrink: 0; }
-        .bot-page .signup-footer { display: flex; gap: 0.75rem; padding: 0 2rem 2rem; }
-        .bot-page .btn-back { flex: 1; height: 44px; border: 1px solid #d1d5db; border-radius: 0.5rem; background: #fff; color: #374151; font-family: 'Raleway', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .bot-page .btn-back:hover { background: #f3f4f6; }
-        .bot-page .btn-continue { flex: 2; height: 44px; border: none; border-radius: 0.5rem; background: linear-gradient(135deg, #497EBC, #1E3A5F); color: #fff; font-family: 'Raleway', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.03em; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(73,126,188,0.3); }
-        .bot-page .btn-continue:hover { box-shadow: 0 6px 20px rgba(73,126,188,0.4); transform: translateY(-1px); }
-        .bot-page .btn-continue:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-        .bot-page .signup-close { position: absolute; top: 1rem; right: 1rem; width: 32px; height: 32px; border-radius: 50%; border: none; background: #f3f4f6; color: #6b7280; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; z-index: 2; }
-        .bot-page .signup-close:hover { background: #e5e7eb; color: #111; }
-
-        /* back nav */
-        .bot-page .back-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; padding: 0 1.5rem; height: 56px; display: flex; align-items: center; justify-content: space-between; transition: all 0.4s; }
-        .bot-page .back-nav.scrolled { background: rgba(30,56,110,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 2px 20px rgba(0,0,0,0.15); }
-        .bot-page .back-btn { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.8); font-family: 'Raleway', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.03em; background: none; border: none; cursor: pointer; padding: 0.5rem 0; transition: color 0.3s; }
-        .bot-page .back-btn:hover { color: #fff; }
-        .bot-page .back-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
-        .bot-page .nav-cta { display: flex; align-items: center; gap: 0.75rem; }
-        .bot-page .nav-cta a { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 1rem; border-radius: 2rem; font-family: 'Raleway', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-decoration: none; transition: all 0.3s; }
-        .bot-page .nav-cta .btn-nav-gold { background: linear-gradient(to right, #b69e60, #a08e54); color: #fff; box-shadow: 0 2px 8px rgba(182,158,96,0.3); }
-        .bot-page .nav-cta .btn-nav-gold:hover { box-shadow: 0 4px 16px rgba(182,158,96,0.4); transform: translateY(-1px); }
-        .bot-page .nav-cta .btn-nav-outline { border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); }
-        .bot-page .nav-cta .btn-nav-outline:hover { background: rgba(255,255,255,0.1); color: #fff; }
-
-        /* version footer */
-        .bot-page .version-footer { background: #0f1b33; padding: 3rem 1rem 2rem; }
-        .bot-page .version-footer-inner { max-width: 48rem; margin: 0 auto; }
-        .bot-page .vf-top { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; margin-bottom: 2rem; }
-        @media (min-width: 640px) { .bot-page .vf-top { flex-direction: row; justify-content: space-between; } }
-        .bot-page .vf-brand { display: flex; align-items: center; gap: 0.5rem; }
-        .bot-page .vf-brand span { font-family: 'Playfair Display', serif; font-size: 16px; color: #fff; font-weight: 600; }
-        .bot-page .vf-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1.25rem; }
-        .bot-page .vf-links a, .bot-page .vf-links button { font-family: 'Raleway', sans-serif; font-size: 12px; color: rgba(255,255,255,0.5); background: none; border: none; cursor: pointer; text-decoration: none; letter-spacing: 0.03em; transition: color 0.2s; padding: 0; }
-        .bot-page .vf-links a:hover, .bot-page .vf-links button:hover { color: #fff; }
-        .bot-page .vf-divider { width: 100%; height: 1px; background: rgba(255,255,255,0.08); margin: 0.5rem 0; }
-        .bot-page .vf-versions { margin-bottom: 1.5rem; }
-        .bot-page .vf-versions-label { font-family: 'Raleway', sans-serif; font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.25); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.75rem; text-align: center; }
-        @media (min-width: 640px) { .bot-page .vf-versions-label { text-align: left; } }
-        .bot-page .vf-version-list { display: flex; flex-direction: column; gap: 0.4rem; }
-        .bot-page .vf-version { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; border-radius: 0.375rem; transition: background 0.2s; cursor: pointer; background: none; border: none; width: 100%; text-align: left; }
-        .bot-page .vf-version:hover { background: rgba(255,255,255,0.04); }
-        .bot-page .vf-version.active { background: rgba(73,126,188,0.12); }
-        .bot-page .vf-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; border: 1.5px solid rgba(255,255,255,0.2); }
-        .bot-page .vf-dot.active { background: #497EBC; border-color: #497EBC; box-shadow: 0 0 6px rgba(73,126,188,0.5); }
-        .bot-page .vf-dot.other { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.15); }
-        .bot-page .vf-version-name { font-family: 'Raleway', sans-serif; font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 500; }
-        .bot-page .vf-version.active .vf-version-name { color: #fff; font-weight: 600; }
-        .bot-page .vf-version-tag { font-family: 'Raleway', sans-serif; font-size: 10px; padding: 0.15rem 0.5rem; border-radius: 2rem; letter-spacing: 0.04em; font-weight: 600; }
-        .bot-page .vf-tag-current { background: rgba(73,126,188,0.2); color: #7EB3E0; }
-        .bot-page .vf-tag-latest { background: rgba(182,158,96,0.2); color: #C9A882; }
-        .bot-page .vf-version-desc { font-family: 'Raleway', sans-serif; font-size: 11px; color: rgba(255,255,255,0.3); margin-left: auto; }
-        @media (max-width: 640px) { .bot-page .vf-version-desc { display: none; } }
-        .bot-page .vf-line { position: relative; }
-        .bot-page .vf-line::before { content: ''; position: absolute; left: calc(0.75rem + 3.5px); top: -0.4rem; width: 1px; height: calc(100% + 0.8rem); background: rgba(255,255,255,0.06); }
-        .bot-page .vf-line:first-child::before { top: 50%; height: 50%; }
-        .bot-page .vf-line:last-child::before { height: 50%; }
-        .bot-page .vf-copyright { text-align: center; font-family: 'Raleway', sans-serif; font-size: 11px; color: rgba(255,255,255,0.25); }
-        .bot-page .vf-copyright strong { color: rgba(255,255,255,0.4); }
-
-        /* page fade in */
-        .bot-page .page-fade { opacity: 0; transform: translateY(12px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
-        .bot-page .page-fade.show { opacity: 1; transform: translateY(0); }
-
-        /* explore banner */
-        .bot-page .explore-banner { background: linear-gradient(135deg, #1e386e, #2a5298); padding: 3rem 1.5rem; text-align: center; }
-        .bot-page .explore-banner h3 { font-family: 'Playfair Display', serif; font-size: 28px; color: #fff; margin-bottom: 0.75rem; }
-        @media (min-width: 640px) { .bot-page .explore-banner h3 { font-size: 34px; } }
-        .bot-page .explore-banner p { font-family: 'Raleway', sans-serif; font-size: 15px; color: rgba(255,255,255,0.7); margin-bottom: 1.5rem; max-width: 28rem; margin-left: auto; margin-right: auto; line-height: 1.6; }
-        .bot-page .explore-banner .btn-row { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
-        .bot-page .explore-banner .btn-row a,
-        .bot-page .explore-banner .btn-row button { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.65rem 1.5rem; border-radius: 2rem; font-family: 'Raleway', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; transition: all 0.3s; text-decoration: none; }
-        .bot-page .explore-banner .btn-explore-gold { background: linear-gradient(to right, #b69e60, #a08e54); color: #fff; border: none; box-shadow: 0 4px 12px rgba(182,158,96,0.3); }
-        .bot-page .explore-banner .btn-explore-gold:hover { box-shadow: 0 6px 20px rgba(182,158,96,0.4); transform: translateY(-1px); }
-        .bot-page .explore-banner .btn-explore-outline { background: none; border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.9); }
-        .bot-page .explore-banner .btn-explore-outline:hover { background: rgba(255,255,255,0.1); }
-      `}</style>
-
-      <div className={`bot-page page-fade ${loaded ? "show" : ""}`}>
-        {/* Back nav */}
-        <div className={`back-nav ${scrolled ? "scrolled" : ""}`}>
-          <button className="back-btn" onClick={() => navigate("/")}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 12H5m0 0l7 7m-7-7l7-7" /></svg>
+    <div className="min-h-screen bg-white font-body text-brand-700">
+      {/* NAV */}
+      <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-400 ${scrolled ? "bg-brand-900/90 backdrop-blur-xl shadow-lg" : "bg-transparent"}`}>
+        <div className={`${CX} flex items-center justify-between h-14 lg:h-16`}>
+          <button onClick={() => navigate("/")} className="flex items-center gap-2 text-white/70 hover:text-white transition text-sm font-semibold">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 12H5m0 0l7 7m-7-7l7-7" /></svg>
             DivinityAGI
           </button>
-          <div className="nav-cta">
-            <a href="https://divinityagi.com/subscribe-now/" className="btn-nav-gold">Buy Minutes</a>
-            <button onClick={() => navigate("/")} className="btn-nav-outline" style={{ border: "1px solid rgba(255,255,255,0.3)", background: "none", color: "rgba(255,255,255,0.8)" }}>
-              Explore Guides
+          <div className="flex items-center gap-2.5">
+            <button onClick={() => setShowSignup(true)} className="px-4 py-1.5 border border-white/20 text-white/80 rounded-full text-[11px] tracking-wider font-bold hover:bg-white/10 transition uppercase">Sign Up</button>
+            <a href="https://divinityagi.com/subscribe-now/" className="px-4 py-1.5 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-full text-[11px] tracking-wider font-bold hover:shadow-lg hover:shadow-gold-500/20 transition shadow-sm uppercase">Investor Portal</a>
+          </div>
+        </div>
+      </nav>
+
+      {/* HERO */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Video bg */}
+        <div className="absolute inset-0">
+          <video autoPlay loop muted playsInline poster={`${BOT}/c24f7eb5677fe9329b550d72ef16016a1f216a6e-DbBhlkSE.png`} className="w-full h-full object-cover object-[center_30%]">
+            <source src={`${WP}/2026/01/Starry-night-bg.mp4`} type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-900/30 via-brand-900/50 to-brand-900/80" />
+        </div>
+        {/* Content */}
+        <div className="relative z-10 text-center text-white px-6 max-w-3xl mx-auto pt-20">
+          <img src={`${BOT}/divinity-gold-private-logo-CsVsJ4O6.png`} alt="DivinityAGI" className="w-64 sm:w-80 md:w-96 lg:w-[420px] mx-auto mb-8" />
+          <p className="text-lg md:text-xl font-display italic text-white/60 mb-10 max-w-md mx-auto">
+            No judgment. No preaching. You're in control.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button onClick={() => setShowSignup(true)} className="px-8 py-3.5 bg-gold-500 text-white rounded-full text-[13px] font-bold tracking-wider hover:bg-gold-600 transition-all hover:shadow-lg hover:shadow-gold-500/30 uppercase w-full sm:w-auto inline-flex items-center justify-center gap-2">
+              <svg className="w-4 h-4" fill="currentColor" stroke="currentColor" strokeWidth="0.5" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4.05 3 5.5l7 7z" /></svg>
+              Start a Check-In -- Free
+            </button>
+            <button onClick={() => document.getElementById("explore")?.scrollIntoView({ behavior: "smooth" })} className="px-8 py-3.5 border border-white/30 text-white rounded-full text-[13px] font-bold tracking-wider hover:bg-white/10 transition uppercase w-full sm:w-auto">
+              Learn More
             </button>
           </div>
         </div>
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce opacity-30">
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+        </div>
+      </section>
 
-        <div className="hero-outer">
-          <div className="hero-tint" aria-hidden="true" />
-
-          {/* HERO */}
-          <div className="hero-inner">
-            <video
-              autoPlay loop muted playsInline
-              poster={`${BOT}/c24f7eb5677fe9329b550d72ef16016a1f216a6e-DbBhlkSE.png`}
-              className="hero-video"
-            >
-              <source src={`${WP}/2026/01/Starry-night-bg.mp4`} type="video/mp4" />
-            </video>
-
-            <div className="hero-logo-wrap">
-              <img src={`${BOT}/divinity-gold-private-logo-CsVsJ4O6.png`} alt="DivinityAGI" />
-            </div>
-
-            <div className="hero-tagline-wrap">
-              <p className="hero-tagline">No judgment. No preaching. You're in control.</p>
-            </div>
+      {/* CHOOSE YOUR WAY IN */}
+      <section id="explore" className="py-20 lg:py-28 bg-brand-50">
+        <div ref={stag.ref} className={CX}>
+          <div className="text-center mb-14">
+            <p className="text-[13px] tracking-[3px] uppercase text-gold-500 font-semibold mb-3">Your Journey Starts Here</p>
+            <h2 className="font-display text-3xl md:text-4xl lg:text-[44px] font-bold text-brand-700 leading-tight">Choose Your Way In</h2>
           </div>
-
-          {/* FIXED CTA BAR */}
-          <div className="cta-bar">
-            <button className="btn-checkin">
-              <svg className="heart-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-              </svg>
-              <span>Start a Check-In — Free</span>
-            </button>
-            <div className="cta-btn-row">
-              <button className="btn-gold" onClick={() => setShowSignup(true)}>
-                <div className="btn-gold-sheen" />
-                <span>Create Account</span>
-              </button>
-              <button className="btn-gold">
-                <div className="btn-gold-sheen" />
-                <span>Sign In</span>
-              </button>
-            </div>
-          </div>
-
-          {/* CONTENT SECTIONS */}
-          <div className="content-sections">
-
-            {/* Choose your way in */}
-            <section>
-              <div className="ways-section">
-                <h2 className="section-h2">Choose your way in</h2>
-                <div className="ways-grid">
-                  <div className="way-card">
-                    <div className="card-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                      </svg>
-                    </div>
-                    <h3 className="card-h3">Find My Guide</h3>
-                    <p className="card-p">A personal match system to help you find the right kind of support for where you are today.</p>
+          <div className="grid sm:grid-cols-2 gap-5 max-w-4xl mx-auto">
+            {[
+              { icon: <><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" /></>, title: "Find My Guide", desc: "A personal match system to help you find the right kind of support for where you are today." },
+              { icon: <><path d="M12 5a3 3 0 113 3m-3-3a3 3 0 10-3 3m3-3v1M9 8a3 3 0 103 3M9 8h1m5 0a3 3 0 11-3 3m3-3h-1m-2 3v-1" /><circle cx="12" cy="8" r="2" /><path d="M12 10v12" /><path d="M12 22c4.2 0 7-1.667 7-5-4.2 0-7 1.667-7 5z" /><path d="M12 22c-4.2 0-7-1.667-7-5 4.2 0 7 1.667 7 5z" /></>, title: "Enter Quiet Space", desc: "Multi-faith guided meditations for calm, grounding, and reflection." },
+              { icon: <><circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 000 20 14.5 14.5 0 000-20" /><path d="M2 12h20" /></>, title: "Explore Traditions", desc: "A respectful multi-faith portal for exploring traditions -- without pressure or judgment." },
+              { icon: <><path d="M7.9 20A9 9 0 104 16.1L2 22z" /></>, title: "Meet Leaders", desc: "Real people, represented as AI chat companions -- created with permission and clear boundaries." },
+            ].map((card, i) => (
+              <div key={i} className={stag.itemCls(i)} style={stag.itemStyle(i)}>
+                <div className="group relative bg-white/70 backdrop-blur-sm border border-brand-100 rounded-2xl p-7 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer h-full">
+                  <div className="w-11 h-11 rounded-xl bg-brand-500/10 flex items-center justify-center mb-5">
+                    <svg className="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">{card.icon}</svg>
                   </div>
-
-                  <div className="way-card">
-                    <div className="card-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M12 5a3 3 0 1 1 3 3m-3-3a3 3 0 1 0-3 3m3-3v1M9 8a3 3 0 1 0 3 3M9 8h1m5 0a3 3 0 1 1-3 3m3-3h-1m-2 3v-1"/>
-                        <circle cx="12" cy="8" r="2"/><path d="M12 10v12"/>
-                        <path d="M12 22c4.2 0 7-1.667 7-5-4.2 0-7 1.667-7 5Z"/>
-                        <path d="M12 22c-4.2 0-7-1.667-7-5 4.2 0 7 1.667 7 5Z"/>
-                      </svg>
-                    </div>
-                    <h3 className="card-h3">Enter Quiet Space</h3>
-                    <p className="card-p">Multi-faith guided meditations for calm, grounding, and reflection.</p>
-                  </div>
-
-                  <div className="way-card">
-                    <div className="card-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>
-                      </svg>
-                    </div>
-                    <h3 className="card-h3">Explore</h3>
-                    <p className="card-p">A respectful multi-faith portal for exploring traditions—without pressure or judgment.</p>
-                  </div>
-
-                  <div className="way-card">
-                    <div className="card-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
-                      </svg>
-                    </div>
-                    <h3 className="card-h3">Meet Leaders</h3>
-                    <p className="card-p">Real people, represented as AI chat companions—created with permission and clear boundaries.</p>
+                  <h3 className="font-display text-xl font-bold text-brand-700 mb-2">{card.title}</h3>
+                  <p className="text-[15px] text-brand-400 leading-relaxed">{card.desc}</p>
+                  <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition">
+                    <svg className="w-4 h-4 text-gold-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M7 17l9.2-9.2M17 17V8h-9" /></svg>
                   </div>
                 </div>
               </div>
-            </section>
-
-            {/* How it works */}
-            <section className="how-section">
-              <div className="how-inner">
-                <h2 className="section-h2">How it works</h2>
-                <div className="steps-wrap">
-                  <div className="step">
-                    <div className="step-num">1</div>
-                    <div>
-                      <h3>Choose a path</h3>
-                      <p>My Spirit Guide, Quiet Space, Circle of Faith, or Verified Leaders.</p>
-                    </div>
-                  </div>
-                  <div className="step">
-                    <div className="step-num">2</div>
-                    <div>
-                      <h3>Start a check-in</h3>
-                      <p>Ask what's on your mind—or simply take a moment to breathe.</p>
-                    </div>
-                  </div>
-                  <div className="step">
-                    <div className="step-num">3</div>
-                    <div>
-                      <h3>Reflect at your pace</h3>
-                      <p>Save insights. Come back anytime.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Divinity is / is not */}
-            <section>
-              <div className="is-section">
-                <div className="is-grid">
-                  <div className="is-card tinted">
-                    <h3>Divinity is</h3>
-                    <p>Reflection, exploration, and support.</p>
-                  </div>
-                  <div className="is-card white">
-                    <h3>Divinity is not</h3>
-                    <p>A religion, therapy, or a replacement for clergy.</p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Privacy & Safety */}
-            <section className="privacy-section">
-              <div className="privacy-inner">
-                <svg className="shield-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                  <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
-                </svg>
-                <h2>Privacy &amp; safety</h2>
-                <p>Spiritual questions are personal. Divinity is designed to be respectful and transparent.</p>
-                <p className="small">If you're in crisis or feeling unsafe, contact local emergency services or a crisis hotline.</p>
-              </div>
-            </section>
-
-            {/* FAQ */}
-            <section>
-              <div className="faq-section">
-                <h2>Frequently asked questions</h2>
-                <div className="faq-list">
-                  <div className="faq-item">
-                    <h3>Is Divinity a religion?</h3>
-                    <p>No. It's a private space for reflection and exploration.</p>
-                  </div>
-                  <div className="faq-item">
-                    <h3>Will it try to convert me?</h3>
-                    <p>No. Your beliefs are yours.</p>
-                  </div>
-                  <div className="faq-item">
-                    <h3>Is this therapy?</h3>
-                    <p>No. Divinity supports reflection, not clinical care.</p>
-                  </div>
-                  <div className="faq-item">
-                    <h3>Do I need to choose a faith?</h3>
-                    <p>No. Start with curiosity and stay there if you want.</p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Explore banner — CTA back to main site */}
-            <section>
-              <div className="explore-banner">
-                <h3>Explore All Spirit Guides</h3>
-                <p>Discover 9+ AI companions from Christianity, Judaism, Buddhism, Indigenous traditions, and more.</p>
-                <div className="btn-row">
-                  <button onClick={() => navigate("/")} className="btn-explore-gold">
-                    <svg style={{ width: 16, height: 16, stroke: "currentColor", fill: "none", strokeWidth: 2 }} viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    Meet All Guides
-                  </button>
-                  <a href="https://divinityagi.com/subscribe-now/" className="btn-explore-outline">Buy Minutes</a>
-                </div>
-              </div>
-            </section>
-
-            {/* Logo break */}
-            <section style={{ background: "#e9f2f8" }}>
-              <div className="logo-break">
-                <img src={`${BOT}/divinity-gold-private-logo-black-DEi-Os5Q.png`} alt="DivinityAGI - A Private Place to Reflect" />
-              </div>
-            </section>
-
-            {/* Ready to begin */}
-            <section className="ready-section">
-              <div className="ready-video-wrap">
-                <video
-                  autoPlay loop muted playsInline
-                  poster={`${BOT}/3c5d95850e2e76f4394e8251568719a80d474f3c-Cw4huU01.png`}
-                  className="ready-video"
-                >
-                  <source src={`${WP}/2026/01/Home-Screen-Cover.mp4`} type="video/mp4" />
-                </video>
-              </div>
-              <div className="ready-content">
-                <div className="ready-text-inner">
-                  <h2>Ready to begin?</h2>
-                  <p>No judgment. No preaching. You're in control.</p>
-                </div>
-              </div>
-            </section>
-
-            {/* Footer */}
-            <footer className="version-footer">
-              <div className="version-footer-inner">
-                <div className="vf-top">
-                  <div className="vf-brand">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#497EBC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                    <span>DivinityAGI</span>
-                  </div>
-                  <div className="vf-links">
-                    <a href="https://divinityagi.com/privacy-policy/">Privacy</a>
-                    <a href="https://divinityagi.com/privacy-policy/">Terms</a>
-                    <a href="mailto:hello@divinityagi.com">Contact</a>
-                    <a href="https://divinityagi.com/subscribe-now/">Buy Minutes</a>
-                  </div>
-                </div>
-
-                <div className="vf-divider" />
-
-                <div className="vf-versions">
-                  <div className="vf-versions-label">Site Versions</div>
-                  <div className="vf-version-list">
-                    <button className="vf-version vf-line" onClick={() => navigate("/")}>
-                      <span className="vf-dot other" />
-                      <span className="vf-version-name">v1.0 — Landing Page</span>
-                      <span className="vf-version-tag vf-tag-latest">latest</span>
-                      <span className="vf-version-desc">Main site · Spirit guides · Pricing</span>
-                    </button>
-                    <button className="vf-version active vf-line" onClick={() => navigate("/bot")}>
-                      <span className="vf-dot active" />
-                      <span className="vf-version-name">v1.1 — DivinityBot</span>
-                      <span className="vf-version-tag vf-tag-current">current</span>
-                      <span className="vf-version-desc">Bot page · Signup flow · Check-in</span>
-                    </button>
-                    <button className="vf-version vf-line" onClick={() => navigate("/v2")}>
-                      <span className="vf-dot other" />
-                      <span className="vf-version-name">v2.0 — Redesign</span>
-                      <span className="vf-version-desc">New layout · Updated sections</span>
-                    </button>
-                    <a className="vf-version vf-line" href="https://www.divinitybot.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
-                      <span className="vf-dot other" />
-                      <span className="vf-version-name">DivinityBot.com</span>
-                      <span className="vf-version-desc">Live app · External ↗</span>
-                    </a>
-                    <a className="vf-version vf-line" href="https://divinityagi.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
-                      <span className="vf-dot other" />
-                      <span className="vf-version-name">DivinityAGI.com</span>
-                      <span className="vf-version-desc">WordPress · Main site ↗</span>
-                    </a>
-                  </div>
-                </div>
-
-                <div className="vf-divider" />
-                <p className="vf-copyright">© 2026 <strong>DivinityAGI</strong> · All rights reserved.</p>
-              </div>
-            </footer>
-
+            ))}
           </div>
         </div>
+      </section>
 
-        {showSignup && <SignupModal onClose={() => setShowSignup(false)} />}
+      {/* CHAT PREVIEW + ABOUT */}
+      <section className="py-20 lg:py-28 overflow-hidden">
+        <div ref={f1.ref} className={`${CX} ${f1.cls}`}>
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <div>
+              <p className="text-[13px] tracking-[3px] uppercase text-gold-500 font-semibold mb-3">Live Preview</p>
+              <h2 className="font-display text-3xl lg:text-[42px] font-bold text-brand-700 mb-5 leading-tight">
+                A Conversation,<br />Not a Sermon
+              </h2>
+              <p className="text-brand-400 text-[15px] lg:text-base leading-relaxed mb-4">
+                DivinityBot meets you where you are. Ask about <strong className="text-brand-600">meaning, doubt, grief, curiosity</strong> -- or just sit in silence. Every response is thoughtful, never preachy.
+              </p>
+              <p className="text-brand-400 text-[15px] lg:text-base leading-relaxed mb-7">
+                Built on <strong className="text-brand-600">deeply researched spiritual traditions</strong>, grounded in compassion, and designed to listen first.
+              </p>
+              <button onClick={() => setShowSignup(true)} className="px-7 py-3 bg-gold-500 text-white rounded-full text-[13px] font-bold tracking-wider hover:bg-gold-600 transition-all hover:shadow-lg uppercase inline-flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                Try It Free
+              </button>
+            </div>
+            <ChatPreview />
+          </div>
+        </div>
+      </section>
 
-        {/* Scroll to top */}
-        <button className="scroll-top-btn" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Scroll to top">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>
-          </svg>
+      {/* HOW IT WORKS */}
+      <section className="py-20 lg:py-28 bg-brand-50">
+        <div ref={f2.ref} className={`${CX} ${f2.cls}`}>
+          <div className="text-center mb-14">
+            <p className="text-[13px] tracking-[3px] uppercase text-gold-500 font-semibold mb-3">Simple & Respectful</p>
+            <h2 className="font-display text-3xl md:text-4xl lg:text-[44px] font-bold text-brand-700 leading-tight">How It Works</h2>
+          </div>
+          <div className="max-w-2xl mx-auto space-y-8">
+            {[
+              { n: "01", title: "Choose a path", desc: "My Spirit Guide, Quiet Space, Circle of Faith, or Verified Leaders." },
+              { n: "02", title: "Start a check-in", desc: "Ask what's on your mind -- or simply take a moment to breathe." },
+              { n: "03", title: "Reflect at your pace", desc: "Save insights. Come back anytime. No timer, no pressure." },
+            ].map((step, i) => (
+              <div key={i} className="flex gap-5 items-start">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center shrink-0 text-sm font-bold shadow-lg shadow-brand-500/20">{step.n}</div>
+                <div>
+                  <h3 className="font-display text-xl font-bold text-brand-700 mb-1">{step.title}</h3>
+                  <p className="text-[15px] text-brand-400 leading-relaxed">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* DIVINITY IS / IS NOT */}
+      <section className="py-20 lg:py-28">
+        <div ref={f3.ref} className={`${CX} ${f3.cls}`}>
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div className="p-8 lg:p-10 rounded-2xl bg-brand-50 border border-brand-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+              <div className="w-10 h-10 rounded-xl bg-brand-500/10 flex items-center justify-center mb-5">
+                <svg className="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
+              <h3 className="font-display text-2xl font-bold text-brand-500 mb-3">Divinity is</h3>
+              <p className="text-[15px] text-brand-400 leading-relaxed">A place for <strong className="text-brand-600">reflection</strong>, <strong className="text-brand-600">exploration</strong>, and <strong className="text-brand-600">support</strong> -- helping you slow down, discover what resonates, and find encouragement whenever you need it.</p>
+            </div>
+            <div className="p-8 lg:p-10 rounded-2xl bg-white border border-brand-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+              <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center mb-5">
+                <svg className="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+              </div>
+              <h3 className="font-display text-2xl font-bold text-brand-700 mb-3">Divinity is not</h3>
+              <p className="text-[15px] text-brand-400 leading-relaxed">Not a religion, not therapy, not a replacement for clergy, and <strong className="text-brand-600">not here to convert or judge</strong>. A complementary tool for reflection and preparation.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PRIVACY & SAFETY */}
+      <section className="py-20 lg:py-28 bg-brand-50">
+        <div ref={f4.ref} className={`${CX} ${f4.cls} text-center max-w-2xl mx-auto`}>
+          <div className="w-14 h-14 rounded-2xl bg-brand-500/10 flex items-center justify-center mx-auto mb-6">
+            <svg className="w-7 h-7 text-brand-500" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>
+          </div>
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-brand-700 mb-5">Privacy & Safety</h2>
+          <p className="text-brand-400 text-[15px] md:text-base leading-relaxed mb-3">
+            Spiritual questions are personal. Divinity is designed to be <strong className="text-brand-600">respectful, transparent, and safe</strong>. Your conversations are confidential and can be deleted at any time.
+          </p>
+          <p className="text-brand-300 text-[14px] leading-relaxed">
+            If you're in crisis or feeling unsafe, contact local emergency services or a crisis hotline.
+          </p>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20 lg:py-28">
+        <div ref={f5.ref} className={`${CX} ${f5.cls}`}>
+          <div className="text-center mb-14">
+            <p className="text-[13px] tracking-[3px] uppercase text-gold-500 font-semibold mb-3">Questions?</p>
+            <h2 className="font-display text-3xl md:text-4xl lg:text-[44px] font-bold text-brand-700 leading-tight">Frequently Asked</h2>
+          </div>
+          <div className="max-w-2xl mx-auto divide-y divide-brand-100">
+            {[
+              { q: "Is Divinity a religion?", a: "No. It's a private space for reflection and exploration. No doctrine, no membership, no pressure." },
+              { q: "Will it try to convert me?", a: "Never. Your beliefs are yours. Every tradition is honored equally -- no path ranked above another." },
+              { q: "Is this therapy?", a: "No. Divinity supports reflection, not clinical care. If professional help is needed, our guides include crisis protocols." },
+              { q: "Do I need to choose a faith?", a: "No. Start with curiosity and stay there as long as you want. Explore multiple traditions freely." },
+            ].map((faq, i) => (
+              <div key={i} className="py-6 first:pt-0 last:pb-0">
+                <h3 className="font-display text-lg font-bold text-brand-700 mb-2">{faq.q}</h3>
+                <p className="text-[15px] text-brand-400 leading-relaxed">{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* EXPLORE GUIDES CTA */}
+      <section className="relative py-24 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-700 via-brand-600 to-brand-800" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gold-500/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-brand-400/20 rounded-full translate-y-1/3 -translate-x-1/4 blur-3xl" />
+        <div ref={f6.ref} className={`relative z-10 ${CX} text-center ${f6.cls}`}>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">Explore All Spirit Guides</h2>
+          <p className="text-brand-200 text-[15px] md:text-base mb-9 max-w-lg mx-auto leading-relaxed">
+            Discover 9+ AI companions from Christianity, Judaism, Buddhism, Indigenous traditions, and more.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button onClick={() => navigate("/")} className="px-8 py-3.5 bg-gold-500 text-white rounded-full text-[13px] font-bold tracking-wider hover:bg-gold-600 transition-all hover:shadow-lg uppercase inline-flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" /></svg>
+              Meet All Guides
+            </button>
+            <button onClick={() => setShowSignup(true)} className="px-8 py-3.5 border border-white/30 text-white rounded-full text-[13px] font-bold tracking-wider hover:bg-white/10 transition uppercase">
+              Create Free Account
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* READY TO BEGIN — video section */}
+      <section className="relative h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0">
+          <video autoPlay loop muted playsInline poster={`${BOT}/3c5d95850e2e76f4394e8251568719a80d474f3c-Cw4huU01.png`} className="w-full h-full object-cover object-[center_20%]">
+            <source src={`${WP}/2026/01/Home-Screen-Cover.mp4`} type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-brand-900/40" />
+        </div>
+        <div className="relative z-10 text-center px-6 max-w-2xl mx-auto">
+          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-5" style={{ textShadow: "0 4px 16px rgba(0,0,0,0.4)" }}>Ready to begin?</h2>
+          <p className="text-white/90 text-lg md:text-xl" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>No judgment. No preaching. You're in control.</p>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="bg-brand-900 py-12">
+        <div className={CX}>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#497EBC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg>
+              <span className="font-display text-white text-base font-semibold">DivinityAGI</span>
+            </div>
+            <div className="flex flex-wrap justify-center gap-5">
+              <a href="https://divinityagi.com/privacy-policy/" className="text-[11px] tracking-wider text-white/40 hover:text-white transition font-semibold uppercase">Privacy</a>
+              <a href="https://divinityagi.com/privacy-policy/" className="text-[11px] tracking-wider text-white/40 hover:text-white transition font-semibold uppercase">Terms</a>
+              <a href="mailto:hello@divinityagi.com" className="text-[11px] tracking-wider text-white/40 hover:text-white transition font-semibold uppercase">Contact</a>
+            </div>
+          </div>
+
+          <div className="border-t border-white/5 pt-6 mb-6">
+            <p className="text-[10px] font-bold tracking-widest text-white/20 uppercase text-center sm:text-left mb-3">Site Versions</p>
+            <div className="space-y-1">
+              {[
+                { label: "v1.0 -- Landing Page", path: "/", desc: "Main site", tag: "latest", tagCls: "bg-gold-500/20 text-gold-300" },
+                { label: "v1.1 -- DivinityBot", path: "/bot", desc: "Bot page", current: true },
+                { label: "v2.0 -- Redesign", path: "/v2", desc: "New layout" },
+                { label: "DivinityBot.com", href: "https://www.divinitybot.com", desc: "Live app" },
+                { label: "DivinityAGI.com", href: "https://divinityagi.com", desc: "WordPress" },
+              ].map((v, i) => v.href ? (
+                <a key={i} href={v.href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/[0.03] transition group">
+                  <span className="w-2 h-2 rounded-full bg-white/15 shrink-0" />
+                  <span className="text-[12px] text-white/50 group-hover:text-white/80 font-medium">{v.label}</span>
+                  <span className="text-[11px] text-white/20 ml-auto hidden sm:inline">{v.desc} &#8599;</span>
+                </a>
+              ) : (
+                <button key={i} onClick={() => navigate(v.path!)} className={`flex items-center gap-3 px-3 py-2 rounded-md transition w-full text-left ${v.current ? "bg-brand-500/10" : "hover:bg-white/[0.03]"}`}>
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${v.current ? "bg-brand-400 shadow-[0_0_6px_rgba(73,126,188,0.5)]" : "bg-white/15"}`} />
+                  <span className={`text-[12px] font-medium ${v.current ? "text-white font-semibold" : "text-white/50"}`}>{v.label}</span>
+                  {v.current && <span className="text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-full bg-brand-400/20 text-brand-300">CURRENT</span>}
+                  {v.tag && <span className={`text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-full ${v.tagCls}`}>{v.tag.toUpperCase()}</span>}
+                  <span className="text-[11px] text-white/20 ml-auto hidden sm:inline">{v.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="border-t border-white/5 pt-5">
+            <p className="text-center text-[11px] text-white/20">&copy; 2026 <strong className="text-white/30">DivinityAGI</strong> &middot; All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+
+      {/* Scroll to top */}
+      {scrolled && (
+        <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="fixed bottom-6 right-6 w-11 h-11 bg-gradient-to-br from-brand-500 to-brand-700 text-white rounded-full shadow-lg shadow-brand-900/30 flex items-center justify-center hover:-translate-y-1 hover:shadow-xl transition-all z-40">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7" /><path d="M12 19V5" /></svg>
         </button>
-      </div>
-    </>
+      )}
+
+      {/* Signup Modal */}
+      {showSignup && <SignupModal onClose={() => setShowSignup(false)} />}
+    </div>
   )
 }

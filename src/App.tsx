@@ -158,7 +158,7 @@ function Nav() {
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
             Try the Bot
           </button>
-          <a href="https://divinityagi.com/subscribe-now/" className="px-5 py-2 bg-gold-500 text-white rounded-full text-[12px] tracking-[1px] font-bold hover:bg-gold-600 transition shadow-sm">Buy Minutes</a>
+          <a href="https://divinityagi.com/subscribe-now/" className="px-5 py-2 bg-gold-500 text-white rounded-full text-[12px] tracking-[1px] font-bold hover:bg-gold-600 transition shadow-sm">Investor Portal</a>
           <button onClick={() => setMobileOpen(!mobileOpen)} className={`lg:hidden p-2 ${scrolled ? "text-brand-500" : "text-white"}`}>
             <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2"><path d={mobileOpen ? "M18 6L6 18M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} /></svg>
           </button>
@@ -674,62 +674,6 @@ function CtaSection() {
   )
 }
 
-/* ── BOT BANNER ── */
-function BotBanner() {
-  const f = useFade()
-  return (
-    <section className="py-20 lg:py-28">
-      <div ref={f.ref} className={`${CX} ${f.cls}`}>
-        <div className="relative rounded-3xl bg-gradient-to-br from-brand-700 via-brand-600 to-brand-800 p-10 lg:p-16 overflow-hidden">
-          <div className="absolute top-0 right-0 w-72 h-72 bg-gold-500/10 rounded-full -translate-y-1/3 translate-x-1/3 blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-56 h-56 bg-brand-400/20 rounded-full translate-y-1/3 -translate-x-1/4 blur-2xl" />
-          <div className="relative z-10 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gold-500/20 rounded-full mb-6">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-[12px] text-gold-300 font-semibold tracking-wider uppercase">Live Now</span>
-            </div>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-[44px] font-bold text-white mb-4 leading-tight">
-              Chat with DivinityBot
-            </h2>
-            <p className="text-brand-200 text-[15px] lg:text-base leading-relaxed mb-8 max-w-lg">
-              Experience our AI spiritual companion right in your browser. Ask questions, explore wisdom, and find guidance — no download required.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <button onClick={() => navigate("/bot")} className="px-8 py-3.5 bg-gold-500 text-white rounded-full text-[13px] font-bold tracking-wider hover:bg-gold-600 transition-all hover:shadow-lg uppercase inline-flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                Try the Bot Free
-              </button>
-              <button onClick={() => scrollTo("guides")} className="px-8 py-3.5 border border-white/30 text-white rounded-full text-[13px] font-bold tracking-wider hover:bg-white/10 transition uppercase">
-                Browse All Guides
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-/* ── FINAL CTA ── */
-function FinalCta() {
-  return (
-    <section className="bg-brand-600 py-20 lg:py-24">
-      <div className={`${CX} text-center`}>
-        <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-5">Begin Your Journey</h2>
-        <p className="text-brand-200 text-[15px] md:text-base mb-9 max-w-lg mx-auto">No pressure. No judgment. Just a compassionate guide ready to listen.</p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <button onClick={() => scrollTo("guides")} className="px-9 py-4 bg-gold-500 text-white rounded-full text-[14px] font-bold tracking-wider hover:bg-gold-600 transition-all hover:shadow-xl uppercase">
-            Meet Your Guide
-          </button>
-          <button onClick={() => navigate("/bot")} className="px-9 py-4 border-2 border-white/30 text-white rounded-full text-[14px] font-bold tracking-wider hover:bg-white/10 transition-all uppercase inline-flex items-center gap-2">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-            Try the Bot
-          </button>
-        </div>
-      </div>
-    </section>
-  )
-}
 
 /* ── FOOTER ── */
 function Footer() {
@@ -819,8 +763,6 @@ function LandingPage() {
       <Leaders />
       <FAQ />
       <CtaSection />
-      <BotBanner />
-      <FinalCta />
       <Footer />
     </div>
   )
