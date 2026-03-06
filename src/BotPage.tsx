@@ -399,6 +399,24 @@ function SignupModal({ onClose }: { onClose: () => void }) {
   )
 }
 
+/* ── FAQ Accordion Item ── */
+function FaqItem({ question, answer, defaultOpen }: { question: string; answer: string; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(!!defaultOpen)
+  return (
+    <div className={`border rounded-xl transition-all duration-300 ${open ? "bg-white border-brand-200 shadow-sm" : "bg-white/60 border-brand-100 hover:border-brand-200"}`}>
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-3 px-5 py-4 text-left">
+        <span className="font-display text-[15px] md:text-[17px] font-semibold text-brand-700 flex-1">{question}</span>
+        <svg className={`w-4 h-4 text-brand-300 shrink-0 transition-transform duration-300 ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" /></svg>
+      </button>
+      <div className={`grid transition-all duration-300 ${open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+        <div className="overflow-hidden">
+          <div className="px-5 pb-5"><p className="text-brand-400 text-[15px] leading-relaxed">{answer}</p></div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ══════════════════════════════════════════
    BOT PAGE
 ══════════════════════════════════════════ */
@@ -444,7 +462,9 @@ export default function BotPage() {
           <video autoPlay loop muted playsInline poster={`${BOT}/c24f7eb5677fe9329b550d72ef16016a1f216a6e-DbBhlkSE.png`} className="w-full h-full object-cover object-[center_30%]">
             <source src={`${WP}/2026/01/Starry-night-bg.mp4`} type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-900/30 via-brand-900/50 to-brand-900/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-900/20 via-brand-900/45 to-brand-900/85" />
+          {/* Shimmer overlay */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px), radial-gradient(circle at 50% 80%, white 1px, transparent 1px)", backgroundSize: "100px 100px, 150px 150px, 200px 200px" }} />
         </div>
         {/* Content */}
         <div className="relative z-10 text-center text-white px-6 max-w-3xl mx-auto pt-20">
@@ -467,6 +487,23 @@ export default function BotPage() {
           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
         </div>
       </section>
+
+      {/* TRUST BAR */}
+      <div className="bg-brand-900 border-b border-white/5 py-5">
+        <div className={`${CX} flex flex-wrap items-center justify-center gap-8 md:gap-14`}>
+          {[
+            { n: "9+", l: "Faith Traditions" },
+            { n: "24/7", l: "Available" },
+            { n: "100%", l: "Confidential" },
+            { n: "0", l: "Judgment" },
+          ].map((s, i) => (
+            <div key={i} className="flex items-center gap-2.5">
+              <span className="font-display text-2xl font-bold text-gold-300">{s.n}</span>
+              <span className="text-[11px] text-white/30 tracking-wider uppercase font-semibold">{s.l}</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* CHOOSE YOUR WAY IN */}
       <section id="explore" className="py-20 lg:py-28 bg-brand-50">
@@ -531,18 +568,21 @@ export default function BotPage() {
             <p className="text-[13px] tracking-[3px] uppercase text-gold-500 font-semibold mb-3">Simple & Respectful</p>
             <h2 className="font-display text-3xl md:text-4xl lg:text-[44px] font-bold text-brand-700 leading-tight">How It Works</h2>
           </div>
-          <div className="max-w-2xl mx-auto space-y-8">
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
             {[
-              { n: "01", title: "Choose a path", desc: "My Spirit Guide, Quiet Space, Circle of Faith, or Verified Leaders." },
-              { n: "02", title: "Start a check-in", desc: "Ask what's on your mind -- or simply take a moment to breathe." },
-              { n: "03", title: "Reflect at your pace", desc: "Save insights. Come back anytime. No timer, no pressure." },
+              { n: "01", title: "Choose a path", desc: "My Spirit Guide, Quiet Space, Circle of Faith, or Verified Leaders.", icon: <><path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></> },
+              { n: "02", title: "Start a check-in", desc: "Ask what's on your mind -- or simply take a moment to breathe.", icon: <><path d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" /></> },
+              { n: "03", title: "Reflect at your pace", desc: "Save insights. Come back anytime. No timer, no pressure.", icon: <><path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></> },
             ].map((step, i) => (
-              <div key={i} className="flex gap-5 items-start">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center shrink-0 text-sm font-bold shadow-lg shadow-brand-500/20">{step.n}</div>
-                <div>
-                  <h3 className="font-display text-xl font-bold text-brand-700 mb-1">{step.title}</h3>
-                  <p className="text-[15px] text-brand-400 leading-relaxed">{step.desc}</p>
+              <div key={i} className="rounded-2xl overflow-hidden bg-white border border-brand-100 hover:shadow-xl transition-all group p-7">
+                <div className="flex items-center gap-3 mb-5">
+                  <span className="inline-flex w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-white text-[13px] font-bold items-center justify-center shadow-md shadow-brand-500/15">{step.n}</span>
+                  <div className="w-9 h-9 rounded-lg bg-brand-50 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">{step.icon}</svg>
+                  </div>
                 </div>
+                <h3 className="font-display text-xl font-bold text-brand-700 mb-2">{step.title}</h3>
+                <p className="text-[14px] text-brand-400 leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -557,15 +597,39 @@ export default function BotPage() {
               <div className="w-10 h-10 rounded-xl bg-brand-500/10 flex items-center justify-center mb-5">
                 <svg className="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               </div>
-              <h3 className="font-display text-2xl font-bold text-brand-500 mb-3">Divinity is</h3>
-              <p className="text-[15px] text-brand-400 leading-relaxed">A place for <strong className="text-brand-600">reflection</strong>, <strong className="text-brand-600">exploration</strong>, and <strong className="text-brand-600">support</strong> -- helping you slow down, discover what resonates, and find encouragement whenever you need it.</p>
+              <h3 className="font-display text-2xl font-bold text-brand-500 mb-4">Divinity is</h3>
+              <ul className="space-y-3">
+                {[
+                  "A safe space for reflection and exploration",
+                  "Multi-faith by design -- welcoming all traditions",
+                  "Built on deeply researched spiritual wisdom",
+                  "Available 24/7, at your own pace",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-[14px] text-brand-400 leading-relaxed">
+                    <svg className="w-4 h-4 mt-0.5 shrink-0 text-gold-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
             <div className="p-8 lg:p-10 rounded-2xl bg-white border border-brand-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
               <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center mb-5">
                 <svg className="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
               </div>
-              <h3 className="font-display text-2xl font-bold text-brand-700 mb-3">Divinity is not</h3>
-              <p className="text-[15px] text-brand-400 leading-relaxed">Not a religion, not therapy, not a replacement for clergy, and <strong className="text-brand-600">not here to convert or judge</strong>. A complementary tool for reflection and preparation.</p>
+              <h3 className="font-display text-2xl font-bold text-brand-700 mb-4">Divinity is not</h3>
+              <ul className="space-y-3">
+                {[
+                  "Not a religion -- no doctrine or membership",
+                  "Not therapy or a replacement for clinical care",
+                  "Not a replacement for real clergy or leaders",
+                  "Not here to convert, judge, or pressure -- ever",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-[14px] text-brand-400 leading-relaxed">
+                    <svg className="w-4 h-4 mt-0.5 shrink-0 text-brand-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" /></svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
@@ -573,15 +637,31 @@ export default function BotPage() {
 
       {/* PRIVACY & SAFETY */}
       <section className="py-20 lg:py-28 bg-brand-50">
-        <div ref={f4.ref} className={`${CX} ${f4.cls} text-center max-w-2xl mx-auto`}>
-          <div className="w-14 h-14 rounded-2xl bg-brand-500/10 flex items-center justify-center mx-auto mb-6">
-            <svg className="w-7 h-7 text-brand-500" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>
+        <div ref={f4.ref} className={`${CX} ${f4.cls}`}>
+          <div className="text-center mb-14">
+            <p className="text-[13px] tracking-[3px] uppercase text-gold-500 font-semibold mb-3">Safety & Trust</p>
+            <h2 className="font-display text-3xl md:text-4xl lg:text-[44px] font-bold text-brand-700 leading-tight mb-4">Built on Responsibility</h2>
+            <p className="text-brand-400 text-[15px] md:text-base max-w-xl mx-auto leading-relaxed">
+              Spiritual questions are personal. Divinity is designed to be <strong className="text-brand-600">respectful, transparent, and safe</strong>.
+            </p>
           </div>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-brand-700 mb-5">Privacy & Safety</h2>
-          <p className="text-brand-400 text-[15px] md:text-base leading-relaxed mb-3">
-            Spiritual questions are personal. Divinity is designed to be <strong className="text-brand-600">respectful, transparent, and safe</strong>. Your conversations are confidential and can be deleted at any time.
-          </p>
-          <p className="text-brand-300 text-[14px] leading-relaxed">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+            {[
+              { icon: <path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />, title: "Curated Responses", desc: "Each guide responds within its tradition" },
+              { icon: <><path d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></>, title: "Crisis Protocols", desc: "Recognizes when professional help is needed" },
+              { icon: <><path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></>, title: "Confidential", desc: "Private conversations, deletable anytime" },
+              { icon: <><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></>, title: "No Manipulation", desc: "No conversion tactics or pressure" },
+            ].map((card, i) => (
+              <div key={i} className="p-5 rounded-xl bg-white border border-brand-100 hover:shadow-md transition-all">
+                <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center mb-4">
+                  <svg className="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">{card.icon}</svg>
+                </div>
+                <p className="text-[13px] font-bold text-brand-700 mb-1">{card.title}</p>
+                <p className="text-[12px] text-brand-300 leading-snug">{card.desc}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-brand-300 text-[13px] mt-8 max-w-lg mx-auto">
             If you're in crisis or feeling unsafe, contact local emergency services or a crisis hotline.
           </p>
         </div>
@@ -594,17 +674,16 @@ export default function BotPage() {
             <p className="text-[13px] tracking-[3px] uppercase text-gold-500 font-semibold mb-3">Questions?</p>
             <h2 className="font-display text-3xl md:text-4xl lg:text-[44px] font-bold text-brand-700 leading-tight">Frequently Asked</h2>
           </div>
-          <div className="max-w-2xl mx-auto divide-y divide-brand-100">
+          <div className="max-w-2xl mx-auto space-y-2.5">
             {[
-              { q: "Is Divinity a religion?", a: "No. It's a private space for reflection and exploration. No doctrine, no membership, no pressure." },
-              { q: "Will it try to convert me?", a: "Never. Your beliefs are yours. Every tradition is honored equally -- no path ranked above another." },
-              { q: "Is this therapy?", a: "No. Divinity supports reflection, not clinical care. If professional help is needed, our guides include crisis protocols." },
-              { q: "Do I need to choose a faith?", a: "No. Start with curiosity and stay there as long as you want. Explore multiple traditions freely." },
+              { q: "Is Divinity a religion?", a: "No. It's a private space for reflection and exploration. Divinity doesn't ask you to believe anything, join anything, or follow any doctrine. Your beliefs are your own.", open: true },
+              { q: "Will it try to convert me?", a: "Never. Your beliefs are yours. Every tradition is honored equally -- no path ranked above another. No conversion tactics, guilt, or pressure -- ever." },
+              { q: "Is this therapy?", a: "No. While our guides offer compassionate spiritual conversation, Divinity is not a substitute for professional mental health care. Our guides include crisis protocols that direct users to appropriate resources." },
+              { q: "Do I need to choose a faith?", a: "No. Start with curiosity and stay there as long as you want. You can explore multiple traditions freely -- there's no commitment to any single path." },
+              { q: "How are the guides built?", a: "Each guide is constructed on deeply researched behavior profiles rooted in real spiritual traditions, reviewed by scholars and practitioners." },
+              { q: "Is my conversation private?", a: "Yes. All conversations are confidential and can be deleted at any time. We don't sell your data." },
             ].map((faq, i) => (
-              <div key={i} className="py-6 first:pt-0 last:pb-0">
-                <h3 className="font-display text-lg font-bold text-brand-700 mb-2">{faq.q}</h3>
-                <p className="text-[15px] text-brand-400 leading-relaxed">{faq.a}</p>
-              </div>
+              <FaqItem key={i} question={faq.q} answer={faq.a} defaultOpen={faq.open} />
             ))}
           </div>
         </div>
@@ -633,16 +712,20 @@ export default function BotPage() {
       </section>
 
       {/* READY TO BEGIN — video section */}
-      <section className="relative h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[40vh] sm:h-[45vh] lg:h-[50vh] min-h-[300px] max-h-[500px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
-          <video autoPlay loop muted playsInline poster={`${BOT}/3c5d95850e2e76f4394e8251568719a80d474f3c-Cw4huU01.png`} className="w-full h-full object-cover object-[center_20%]">
+          <video autoPlay loop muted playsInline poster={`${BOT}/3c5d95850e2e76f4394e8251568719a80d474f3c-Cw4huU01.png`} className="w-full h-full object-cover object-center">
             <source src={`${WP}/2026/01/Home-Screen-Cover.mp4`} type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-brand-900/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-900/70 via-brand-900/40 to-brand-900/30" />
         </div>
         <div className="relative z-10 text-center px-6 max-w-2xl mx-auto">
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-5" style={{ textShadow: "0 4px 16px rgba(0,0,0,0.4)" }}>Ready to begin?</h2>
-          <p className="text-white/90 text-lg md:text-xl" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>No judgment. No preaching. You're in control.</p>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4" style={{ textShadow: "0 4px 16px rgba(0,0,0,0.4)" }}>Ready to begin?</h2>
+          <p className="text-white/80 text-base md:text-lg mb-7" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>No judgment. No preaching. You're in control.</p>
+          <button onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); setTimeout(() => setShowSignup(true), 600) }} className="px-8 py-3 bg-gold-500 text-white rounded-full text-[13px] font-bold tracking-wider hover:bg-gold-600 transition-all hover:shadow-lg hover:shadow-gold-500/30 uppercase inline-flex items-center gap-2">
+            <svg className="w-4 h-4" fill="currentColor" stroke="currentColor" strokeWidth="0.5" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4.05 3 5.5l7 7z" /></svg>
+            Start Your Journey
+          </button>
         </div>
       </section>
 
