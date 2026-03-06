@@ -765,7 +765,34 @@ function Footer() {
           <a href="https://divinityagi.com/privacy-policy/" className="text-[11px] tracking-[1.5px] text-brand-300 hover:text-brand-600 font-semibold uppercase transition">Terms</a>
           <a href="mailto:hello@divinityagi.com" className="text-[11px] tracking-[1.5px] text-brand-300 hover:text-brand-600 font-semibold uppercase transition">Contact</a>
         </div>
-        <p className="text-center text-[12px] text-brand-300">© 2026 <strong className="text-brand-500">DivinityAGI</strong> · All rights reserved.</p>
+        <p className="text-center text-[12px] text-brand-300 mb-8">© 2026 <strong className="text-brand-500">DivinityAGI</strong> · All rights reserved.</p>
+
+        {/* Version switcher */}
+        <div className="border-t border-brand-100 pt-6">
+          <p className="text-[10px] font-bold tracking-[0.12em] text-brand-200 uppercase text-center mb-3">Site Versions</p>
+          <div className="flex flex-col gap-1 max-w-sm mx-auto">
+            {[
+              { label: "v1.0 — Landing Page", path: "/", desc: "Main site", current: true },
+              { label: "v1.1 — DivinityBot", path: "/bot", desc: "Bot page · Signup" },
+              { label: "v2.0 — Redesign", path: "/v2", desc: "New layout" },
+              { label: "DivinityBot.com", href: "https://www.divinitybot.com", desc: "Live app ↗" },
+              { label: "DivinityAGI.com", href: "https://divinityagi.com", desc: "WordPress ↗" },
+            ].map((v, i) => v.href ? (
+              <a key={i} href={v.href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-brand-50 transition group">
+                <span className="w-2 h-2 rounded-full bg-brand-100 shrink-0" />
+                <span className="text-[12px] text-brand-400 group-hover:text-brand-600 font-medium">{v.label}</span>
+                <span className="text-[11px] text-brand-200 ml-auto hidden sm:inline">{v.desc}</span>
+              </a>
+            ) : (
+              <button key={i} onClick={() => navigate(v.path!)} className={`flex items-center gap-3 px-3 py-2 rounded-md transition text-left ${v.current ? "bg-brand-50" : "hover:bg-brand-50"}`}>
+                <span className={`w-2 h-2 rounded-full shrink-0 ${v.current ? "bg-brand-500 shadow-[0_0_6px_rgba(73,126,188,0.5)]" : "bg-brand-100"}`} />
+                <span className={`text-[12px] font-medium ${v.current ? "text-brand-600 font-semibold" : "text-brand-400 hover:text-brand-600"}`}>{v.label}</span>
+                {v.current && <span className="text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-full bg-brand-100 text-brand-500">CURRENT</span>}
+                <span className="text-[11px] text-brand-200 ml-auto hidden sm:inline">{v.desc}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </footer>
   )

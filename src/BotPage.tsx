@@ -504,6 +504,41 @@ export default function BotPage() {
         .bot-page .nav-cta .btn-nav-outline { border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); }
         .bot-page .nav-cta .btn-nav-outline:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
+        /* version footer */
+        .bot-page .version-footer { background: #0f1b33; padding: 3rem 1rem 2rem; }
+        .bot-page .version-footer-inner { max-width: 48rem; margin: 0 auto; }
+        .bot-page .vf-top { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; margin-bottom: 2rem; }
+        @media (min-width: 640px) { .bot-page .vf-top { flex-direction: row; justify-content: space-between; } }
+        .bot-page .vf-brand { display: flex; align-items: center; gap: 0.5rem; }
+        .bot-page .vf-brand span { font-family: 'Playfair Display', serif; font-size: 16px; color: #fff; font-weight: 600; }
+        .bot-page .vf-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1.25rem; }
+        .bot-page .vf-links a, .bot-page .vf-links button { font-family: 'Raleway', sans-serif; font-size: 12px; color: rgba(255,255,255,0.5); background: none; border: none; cursor: pointer; text-decoration: none; letter-spacing: 0.03em; transition: color 0.2s; padding: 0; }
+        .bot-page .vf-links a:hover, .bot-page .vf-links button:hover { color: #fff; }
+        .bot-page .vf-divider { width: 100%; height: 1px; background: rgba(255,255,255,0.08); margin: 0.5rem 0; }
+        .bot-page .vf-versions { margin-bottom: 1.5rem; }
+        .bot-page .vf-versions-label { font-family: 'Raleway', sans-serif; font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.25); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.75rem; text-align: center; }
+        @media (min-width: 640px) { .bot-page .vf-versions-label { text-align: left; } }
+        .bot-page .vf-version-list { display: flex; flex-direction: column; gap: 0.4rem; }
+        .bot-page .vf-version { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; border-radius: 0.375rem; transition: background 0.2s; cursor: pointer; background: none; border: none; width: 100%; text-align: left; }
+        .bot-page .vf-version:hover { background: rgba(255,255,255,0.04); }
+        .bot-page .vf-version.active { background: rgba(73,126,188,0.12); }
+        .bot-page .vf-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; border: 1.5px solid rgba(255,255,255,0.2); }
+        .bot-page .vf-dot.active { background: #497EBC; border-color: #497EBC; box-shadow: 0 0 6px rgba(73,126,188,0.5); }
+        .bot-page .vf-dot.other { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.15); }
+        .bot-page .vf-version-name { font-family: 'Raleway', sans-serif; font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 500; }
+        .bot-page .vf-version.active .vf-version-name { color: #fff; font-weight: 600; }
+        .bot-page .vf-version-tag { font-family: 'Raleway', sans-serif; font-size: 10px; padding: 0.15rem 0.5rem; border-radius: 2rem; letter-spacing: 0.04em; font-weight: 600; }
+        .bot-page .vf-tag-current { background: rgba(73,126,188,0.2); color: #7EB3E0; }
+        .bot-page .vf-tag-latest { background: rgba(182,158,96,0.2); color: #C9A882; }
+        .bot-page .vf-version-desc { font-family: 'Raleway', sans-serif; font-size: 11px; color: rgba(255,255,255,0.3); margin-left: auto; }
+        @media (max-width: 640px) { .bot-page .vf-version-desc { display: none; } }
+        .bot-page .vf-line { position: relative; }
+        .bot-page .vf-line::before { content: ''; position: absolute; left: calc(0.75rem + 3.5px); top: -0.4rem; width: 1px; height: calc(100% + 0.8rem); background: rgba(255,255,255,0.06); }
+        .bot-page .vf-line:first-child::before { top: 50%; height: 50%; }
+        .bot-page .vf-line:last-child::before { height: 50%; }
+        .bot-page .vf-copyright { text-align: center; font-family: 'Raleway', sans-serif; font-size: 11px; color: rgba(255,255,255,0.25); }
+        .bot-page .vf-copyright strong { color: rgba(255,255,255,0.4); }
+
         /* page fade in */
         .bot-page .page-fade { opacity: 0; transform: translateY(12px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
         .bot-page .page-fade.show { opacity: 1; transform: translateY(0); }
@@ -758,6 +793,62 @@ export default function BotPage() {
                 </div>
               </div>
             </section>
+
+            {/* Footer */}
+            <footer className="version-footer">
+              <div className="version-footer-inner">
+                <div className="vf-top">
+                  <div className="vf-brand">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#497EBC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    <span>DivinityAGI</span>
+                  </div>
+                  <div className="vf-links">
+                    <a href="https://divinityagi.com/privacy-policy/">Privacy</a>
+                    <a href="https://divinityagi.com/privacy-policy/">Terms</a>
+                    <a href="mailto:hello@divinityagi.com">Contact</a>
+                    <a href="https://divinityagi.com/subscribe-now/">Buy Minutes</a>
+                  </div>
+                </div>
+
+                <div className="vf-divider" />
+
+                <div className="vf-versions">
+                  <div className="vf-versions-label">Site Versions</div>
+                  <div className="vf-version-list">
+                    <button className="vf-version vf-line" onClick={() => navigate("/")}>
+                      <span className="vf-dot other" />
+                      <span className="vf-version-name">v1.0 — Landing Page</span>
+                      <span className="vf-version-tag vf-tag-latest">latest</span>
+                      <span className="vf-version-desc">Main site · Spirit guides · Pricing</span>
+                    </button>
+                    <button className="vf-version active vf-line" onClick={() => navigate("/bot")}>
+                      <span className="vf-dot active" />
+                      <span className="vf-version-name">v1.1 — DivinityBot</span>
+                      <span className="vf-version-tag vf-tag-current">current</span>
+                      <span className="vf-version-desc">Bot page · Signup flow · Check-in</span>
+                    </button>
+                    <button className="vf-version vf-line" onClick={() => navigate("/v2")}>
+                      <span className="vf-dot other" />
+                      <span className="vf-version-name">v2.0 — Redesign</span>
+                      <span className="vf-version-desc">New layout · Updated sections</span>
+                    </button>
+                    <a className="vf-version vf-line" href="https://www.divinitybot.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+                      <span className="vf-dot other" />
+                      <span className="vf-version-name">DivinityBot.com</span>
+                      <span className="vf-version-desc">Live app · External ↗</span>
+                    </a>
+                    <a className="vf-version vf-line" href="https://divinityagi.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+                      <span className="vf-dot other" />
+                      <span className="vf-version-name">DivinityAGI.com</span>
+                      <span className="vf-version-desc">WordPress · Main site ↗</span>
+                    </a>
+                  </div>
+                </div>
+
+                <div className="vf-divider" />
+                <p className="vf-copyright">© 2026 <strong>DivinityAGI</strong> · All rights reserved.</p>
+              </div>
+            </footer>
 
           </div>
         </div>
